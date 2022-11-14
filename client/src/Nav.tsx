@@ -23,6 +23,7 @@ const NavItem = styled(Link)`
   color: #fff;
   margin: 0 1rem;
   cursor: pointer;
+  text-decoration: none;
 `
 
 
@@ -31,6 +32,7 @@ export const Nav = () => {
     <Wrapper>
       <NavItem to="/">Home</NavItem>
       <NavItem to="/trade">Trade</NavItem>
+      <NavItem to="/profile">Profile</NavItem>
     </Wrapper>
   )
 }
