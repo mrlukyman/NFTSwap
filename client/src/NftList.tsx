@@ -22,7 +22,7 @@ const settings = {
   network: Network.ETH_MAINNET,
 }
 
-const alchemy = new Alchemy(settings);
+const alchemy = new Alchemy(settings)
 
 type Nft = OwnedNft & {
   price: string | undefined
@@ -43,7 +43,7 @@ export const NftList = () => {
       //   const nftSales = await fetch(`https://eth-mainnet.g.alchemy.com/nft/v2/tMAv6td0-2LUKzf9-hTghVryZtd9xsqc/getNFTSales?contractAddress=${"0x" + parseInt(nft.contract.address, 16)}&tokenId=${nft.tokenId}&startBlock=latest&startLogIndex=0&startBundleIndex=0&ascendingOrder=true&marketplace=seaport`, options)
       //     .then(response => response.json())
       //     .catch(err => console.error(err))
-          
+
       //   mappedNfts.push({
       //     ...nft,
       //     price: nftSales.nftSales[0]?.price
@@ -54,20 +54,20 @@ export const NftList = () => {
     };
     main();
   }, [loadingContext])
-  return(
-      <Wrapper>
-        {
-          listOfNfts?.map((nft: OwnedNft) => (
-            nft.rawMetadata
-              ? <NftCard
-                  imgSrc={nft.rawMetadata.image}
-                  authorImgSrc={nft.rawMetadata.image}
-                  title={nft.title}
-                  priceInEth="1"
-                  priceInEur="1" 
-                />
-              : null
+  return (
+    <Wrapper>
+      {
+        listOfNfts?.map((nft: OwnedNft) => (
+          nft.rawMetadata
+            ? <NftCard
+              imgSrc={nft.rawMetadata.image}
+              authorImgSrc={nft.rawMetadata.image}
+              title={nft.title}
+              priceInEth="1"
+              priceInEur="1"
+            />
+            : null
         ))}
-      </Wrapper>
+    </Wrapper>
   )
 }

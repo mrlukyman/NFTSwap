@@ -1,7 +1,7 @@
 import { createGlobalStyle } from "styled-components"
 import styled from 'styled-components'
 import { Colors } from './Colors'
- 
+
 export const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -56,9 +56,17 @@ export const Text = styled.p`
   margin: 0;
 `
 
+export const SmallText = styled.p`
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin: 0;
+  color: white;
+`
+
 export const Button = styled.button`
-  transition: 0.5s ease-in-out;
+  transition: 0.36s ease-in;
   border-radius: 15px;
+  border: 1px solid #F81DFB;
   &:hover {
     ;
     background: ${Colors.primary};

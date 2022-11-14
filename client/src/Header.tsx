@@ -11,16 +11,16 @@ import { Colors } from './styles/Colors'
 import { Link } from 'react-router-dom'
 
 topbar.config({
-    autoRun: true,
-    barThickness: 5,
-    barColors: {
-        0: '#3a0528b0',
-        .3: '#a91573af',
-        1.0: Colors.primary,
-    },
-    shadowBlur: 10,
-    shadowColor: 'pink',
-    className: 'topbar'
+  autoRun: true,
+  barThickness: 5,
+  barColors: {
+    0: '#3a0528b0',
+    .3: '#a91573af',
+    1.0: Colors.primary,
+  },
+  shadowBlur: 10,
+  shadowColor: 'pink',
+  className: 'topbar'
 })
 
 const customStyles = {
@@ -65,8 +65,7 @@ const Logo = styled(Link)`
 const WalletButton = styled(Button)`
   height: 3rem;
   width: 10rem;
-  background: rgba(248, 29, 251, 0.05);
-  border: 1px solid #F81DFB;
+  background: ${Colors.cardBackground};
   color: #fff;
   font-size: 14px;
   font-weight: 600;
@@ -108,21 +107,21 @@ const usernameInput = styled.input`
 // `
 
 declare global {
-  interface Window{
-    ethereum?:MetaMaskInpageProvider
+  interface Window {
+    ethereum?: MetaMaskInpageProvider
   }
 }
 
 Modal.setAppElement('#root');
 
 export const Header = () => {
-  const [walletAddress, setWalletAddress] = useState("");
-  // const [status, setStatus] = useState("");
-  let subtitle: any;
-  const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [walletAddress, setWalletAddress] = useState("")
+  // const [status, setStatus] = useState("")
+  let subtitle: any
+  const [modalIsOpen, setModalIsOpen] = React.useState(false)
 
   function openModal() {
-    setIsOpen(true);
+    setModalIsOpen(true)
   }
 
   function afterOpenModal() {
@@ -131,30 +130,31 @@ export const Header = () => {
   }
 
   function closeModal() {
-    setIsOpen(false);
+    setModalIsOpen(false)
   }
   const connectWallet = async () => {
     try {
-      const { ethereum } = window;
+      const { ethereum } = window
       if (!ethereum) {
-        alert("Get MetaMask!");
-        return;
+        alert("Get MetaMask!")
+        return
       }
-      const accounts = await ethereum.request({ method: "eth_requestAccounts" });
-      if(accounts instanceof Array){
-        console.log("Connected", accounts[0]);
-        setWalletAddress(accounts[0]);
+      const accounts = await ethereum.request({ method: "eth_requestAccounts" })
+      if (accounts instanceof Array) {
+        console.log("Connected", accounts[0])
+        setWalletAddress(accounts[0])
+        setModalIsOpen(false)
       } else {
-        console.log("Connected", accounts);
+        console.log("Connected", accounts)
       }
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
   useEffect(() => {
     if (typeof window.ethereum !== 'undefined') {
-      console.log('MetaMask is installed!');
+      console.log('MetaMask is installed!')
     }
   }, []);
 
@@ -163,11 +163,13 @@ export const Header = () => {
       <Logo to="/">NFTswap</Logo>
       <Nav />
       <UserWrapper>
-        <WalletButton onClick={openModal}>
-          {walletAddress.length > 0 
-          ? `${walletAddress.substring(0, 6)}...${walletAddress.substring(38)}` 
-          : "Connect Wallet"}
-        </WalletButton>
+        {walletAddress.length > 0 ?
+          <FaUserCircle size="30" />
+          :
+          <WalletButton onClick={openModal}>
+            Connect Wallet
+          </WalletButton>
+        }
         {/* <FaUserCircle onClick={openModal} size={40} color="#fff" /> */}
         <Modal
           isOpen={modalIsOpen}
@@ -177,11 +179,14 @@ export const Header = () => {
           contentLabel="Register"
           closeTimeoutMS={500}
         >
-          <CgClose onClick={closeModal} size={30} color="#fff"/>
-          <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Hello</h2>
-          <form>
+          <CgClose onClick={closeModal} size={20} color="#fff" />
+          {/* <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Hello</h2> */}
+          <WalletButton onClick={connectWallet}>Metamask</WalletButton>
+          <WalletButton>Placeholder</WalletButton>
+          <WalletButton>Placeholder</WalletButton>
+          {/* <form>
             <input type="text" />
-          </form>
+          </form> */}
         </Modal>
       </UserWrapper>
     </Wrapper>

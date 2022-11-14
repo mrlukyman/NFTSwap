@@ -80,15 +80,16 @@ const InfoWrapper = styled.div`
 const PriceWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
+  flex-basis: 100%;
 `
 
-const Sale = styled.p`
-  font-size: 16px;
-  font-weight: 400;
-  color: #fff;
-  margin: 0;
-`
+// const Sale = styled.p`
+//   font-size: 16px;
+//   font-weight: 400;
+//   color: #fff;
+//   margin: 0;
+// `
 
 const PriceInEth = styled.p`
   font-size: 20px;
@@ -115,14 +116,14 @@ const PriceInEur = styled.p`
 type Props = {
   imgSrc: string | undefined
   authorImgSrc: string | undefined
-  title: string 
+  title: string
   priceInEth: string | undefined
   priceInEur: string
 }
 
 export const NftCard = (props: Props) => {
   return (
-    <Card> 
+    <Card>
       <Wrapper>
         <Image src={props.imgSrc} />
         <BottomPartWrapper>
@@ -133,7 +134,6 @@ export const NftCard = (props: Props) => {
             </AtuthorNameWrapper>
           </AuthorWrapper>
           <InfoWrapper>
-            <Sale>On sale 🔥</Sale>
             <PriceWrapper>
               <PriceInEth>{props.priceInEth} ETH</PriceInEth>
               <PriceInEur>({props.priceInEur}€)</PriceInEur>

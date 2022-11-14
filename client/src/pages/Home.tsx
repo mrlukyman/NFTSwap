@@ -1,5 +1,5 @@
 import React from 'react';
-//import { NftList } from './NftList';
+import { NftList } from '../NftList';
 import { Header } from '../Header';
 import { Hero } from '../Hero';
 import { SupportedWallets } from '../SupportedWallets';
@@ -12,7 +12,6 @@ export const Home = () => {
       <Header />
       <Hero />
       <SupportedWallets />
-      {/* <NftList /> */}
     </Container>
   );
 }
