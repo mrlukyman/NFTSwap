@@ -3,9 +3,9 @@ import { NftCard } from './NftCard';
 import { Alchemy, Network, OwnedNft, OwnedNftsResponse } from "alchemy-sdk";
 import styled from 'styled-components';
 import { useLoadingContext } from 'react-router-loading';
-import { Container } from './styles/GlobalStyles';
-import { asyncForEach } from './api/asyncHelper';
-import config from './config.json';
+import { Container } from '../styles/GlobalStyles';
+import { asyncForEach } from '../api/asyncHelper';
+import config from '../config.json';
 import { TradingCard } from './TradingCard';
 
 const settings = {
@@ -16,13 +16,13 @@ const settings = {
 const alchemy = new Alchemy(settings)
 
 const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-  grid-gap: 1rem;
-  width: 40vw;
-  height: 87vh;
-  justify-items: start;
-  overflow-y: scroll;
+  display: flex;
+  overflow-x: scroll;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
 `
 
 export const NftTradingList = () => {

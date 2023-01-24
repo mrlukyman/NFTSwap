@@ -68,8 +68,9 @@ export const Button = styled.button`
   border-radius: 15px;
   border: 1px solid #F81DFB;
   &:hover {
-    ;
-    background: ${Colors.primary};
+    box-shadow: 0px 0px 1rem 0px rgba(248,29,251,0.75);
+    -webkit-box-shadow: 0px 0px 1rem 0px rgba(248,29,251,0.75);
+    -moz-box-shadow: 0px 0px 1rem 0px rgba(248,29,251,0.75);
   }
 `
 

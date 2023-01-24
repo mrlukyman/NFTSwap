@@ -1,7 +1,7 @@
 import React from "react"
 import styled from "styled-components"
-import { SmallText } from "./styles/GlobalStyles"
-import { Colors } from "./styles/Colors"
+import { SmallText } from "../styles/GlobalStyles"
+import { Colors } from "../styles/Colors"
 
 const Card = styled.div`
   display: flex;

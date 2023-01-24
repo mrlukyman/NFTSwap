@@ -3,12 +3,14 @@ import styled from 'styled-components'
 import Modal from 'react-modal'
 import { topbar } from "react-router-loading"
 import { FaUserCircle } from 'react-icons/fa'
+import { FaEthereum } from 'react-icons/fa'
 import { CgClose } from "react-icons/cg"
 import { MetaMaskInpageProvider } from "@metamask/providers"
 import { Nav } from './Nav'
-import { Button } from './styles/GlobalStyles'
-import { Colors } from './styles/Colors'
+import { Button } from '../styles/GlobalStyles'
+import { Colors } from '../styles/Colors'
 import { Link } from 'react-router-dom'
+import { Form } from '../components/Form'
 
 topbar.config({
   autoRun: true,
@@ -78,16 +80,34 @@ const UserWrapper = styled.div`
   align-items: center;
 `
 
-const usernameInput = styled.input`
-  height: 3rem;
-  width: 10rem;
-  background: rgba(248, 29, 251, 0.05);
-  border: 1px solid #F81DFB;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  margin-right: 2rem;
+const UserIcon = styled(FaUserCircle)`
+  border-radius: 50%;
+  border: 3px solid #fff;
+  background: ${Colors.cardBackground};
+  padding: 0.3rem;
 `
+
+const Balance = styled.div`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 1rem 0 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`
+
+// const usernameInput = styled.input`
+//   height: 3rem;
+//   width: 10rem;
+//   background: rgba(248, 29, 251, 0.05);
+//   border: 1px solid #F81DFB;
+//   color: #fff;
+//   font-size: 14px;
+//   font-weight: 600;
+//   margin-right: 2rem;
+// `
 
 // const DropdownToggle = styled(Dropdown.Toggle)`
 //   background: none;
@@ -108,17 +128,19 @@ const usernameInput = styled.input`
 
 declare global {
   interface Window {
-    ethereum?: MetaMaskInpageProvider
+    ethereum?: MetaMaskInpageProvider | undefined
   }
 }
 
 Modal.setAppElement('#root');
 
 export const Header = () => {
-  const [walletAddress, setWalletAddress] = useState("")
+  // const [walletAddress, setWalletAddress] = useState("")
   // const [status, setStatus] = useState("")
+  const [defaultAccount, setDefaultAccount] = useState("")
+  const [userBalance, setUserBalance] = useState(0)
+  const [modalIsOpen, setModalIsOpen] = useState(false)
   let subtitle: any
-  const [modalIsOpen, setModalIsOpen] = React.useState(false)
 
   function openModal() {
     setModalIsOpen(true)
@@ -132,18 +154,20 @@ export const Header = () => {
   function closeModal() {
     setModalIsOpen(false)
   }
+
+  const { ethereum } = window
+
   const connectWallet = async () => {
     try {
-      const { ethereum } = window
       if (!ethereum) {
         alert("Get MetaMask!")
         return
       }
       const accounts = await ethereum.request({ method: "eth_requestAccounts" })
       if (accounts instanceof Array) {
+        accountChangedHandler(accounts[0])
         console.log("Connected", accounts[0])
-        setWalletAddress(accounts[0])
-        setModalIsOpen(false)
+        //setWalletAddress(accounts[0])
       } else {
         console.log("Connected", accounts)
       }
@@ -158,13 +182,40 @@ export const Header = () => {
     }
   }, []);
 
+  const accountChangedHandler = (newAccount: any) => {
+    setDefaultAccount(newAccount)
+    getUserBalance(newAccount)
+
+  }
+
+  const getUserBalance = async (address: any) => {
+    if (!ethereum) {
+      console.log("You are not connected!")
+    } else {
+      ethereum.request({ method: 'eth_getBalance', params: [address, 'latest'] })
+        .then((balance: any) => {
+          console.log(balance)
+          const balanceInEth: number = parseInt(balance.toString(), 16) / 1000000000000000000
+          setUserBalance(parseFloat(balanceInEth.toFixed(4)))
+        })
+    }
+  }
+
+  ethereum?.on('accountsChanged', accountChangedHandler)
+
   return (
     <Wrapper>
       <Logo to="/">NFTswap</Logo>
       <Nav />
       <UserWrapper>
-        {walletAddress.length > 0 ?
-          <FaUserCircle size="30" />
+        {defaultAccount ?
+          <>
+            <Balance>
+              <FaEthereum size="20" />
+              {userBalance}
+            </Balance>
+            <UserIcon size="30" />
+          </>
           :
           <WalletButton onClick={openModal}>
             Connect Wallet
@@ -181,9 +232,15 @@ export const Header = () => {
         >
           <CgClose onClick={closeModal} size={20} color="#fff" />
           {/* <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Hello</h2> */}
-          <WalletButton onClick={connectWallet}>Metamask</WalletButton>
-          <WalletButton>Placeholder</WalletButton>
-          <WalletButton>Placeholder</WalletButton>
+          {defaultAccount ?
+            <Form address={defaultAccount} />
+            :
+            <>
+              <WalletButton onClick={connectWallet}>Metamask</WalletButton>
+              <WalletButton>Placeholder</WalletButton>
+              <WalletButton>Placeholder</WalletButton>
+            </>
+          }
           {/* <form>
             <input type="text" />
           </form> */}

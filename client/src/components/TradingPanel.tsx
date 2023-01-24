@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { Colors } from './styles/Colors'
-import { SmallText } from './styles/GlobalStyles'
-import { Button } from './styles/GlobalStyles'
+import { Colors } from '../styles/Colors'
+import { SmallText } from '../styles/GlobalStyles'
+import { Button } from '../styles/GlobalStyles'
 
 const Wrapper = styled.div`
   width: 10rem;
@@ -18,7 +18,7 @@ const TrdingPanel = styled.div`
   border-radius: 15px;
   margin-right: 5px;
   align-items: center;
-  height: 100%;
+  flex: 1;
   justify-content: space-between;
 `
 

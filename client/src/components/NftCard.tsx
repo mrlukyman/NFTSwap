@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Colors } from './styles/Colors';
+import { Colors } from '../styles/Colors';
+import { FaEthereum } from 'react-icons/fa'
 
 const Card = styled.div`
   display: flex;
@@ -9,8 +10,8 @@ const Card = styled.div`
   backdrop-filter: blur(10px);
   /* Note: backdrop-filter has minimal browser support */
   border-radius: 15px;
-  height: 34rem;
-  width: 24.5rem;
+  //height: 34rem;
+  max-width: 24.5rem;
 `
 
 const Wrapper = styled.div`
@@ -41,7 +42,6 @@ const BottomPartWrapper = styled.div`
 const AuthorWrapper = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
 `
 
 const AuthorImage = styled.img`
@@ -96,6 +96,9 @@ const PriceInEth = styled.p`
   font-weight: 600;
   color: #fff;
   margin: 0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `
 const PriceInEur = styled.p`
   font-size: 12px;
@@ -128,17 +131,20 @@ export const NftCard = (props: Props) => {
         <Image src={props.imgSrc} />
         <BottomPartWrapper>
           <AuthorWrapper>
-            <AuthorImage src={props.authorImgSrc} />
+            {/* <AuthorImage src={props.authorImgSrc} /> */}
             <AtuthorNameWrapper>
               <Title>{props.title}</Title>
             </AtuthorNameWrapper>
-          </AuthorWrapper>
-          <InfoWrapper>
             <PriceWrapper>
-              <PriceInEth>{props.priceInEth} ETH</PriceInEth>
-              <PriceInEur>({props.priceInEur}€)</PriceInEur>
+              <PriceInEth>
+                {props.priceInEth}
+                <FaEthereum />
+              </PriceInEth>
+              {/* <PriceInEur>({props.priceInEur}€)</PriceInEur> */}
             </PriceWrapper>
-          </InfoWrapper>
+          </AuthorWrapper>
+          {/* <InfoWrapper>
+          </InfoWrapper> */}
           {/* <BuyButton>Buy Now</BuyButton> */}
         </BottomPartWrapper>
       </Wrapper>

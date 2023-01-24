@@ -3,9 +3,9 @@ import { NftCard } from './NftCard';
 import { Alchemy, Network, OwnedNft, OwnedNftsResponse } from "alchemy-sdk";
 import styled from 'styled-components';
 import { useLoadingContext } from 'react-router-loading';
-import { Container } from './styles/GlobalStyles';
-import { asyncForEach } from './api/asyncHelper';
-import config from './config.json';
+import { Container } from '../styles/GlobalStyles';
+import { asyncForEach } from '../api/asyncHelper';
+import config from '../config.json';
 
 const Wrapper = styled.div`
   display: flex;

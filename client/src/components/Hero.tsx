@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button, LightText, Title } from './styles/GlobalStyles';
-import nft_image from './assets/hero_nfts.png';
-import milky_way from './assets/milky_way.png';
+import { Button, LightText, Title } from '../styles/GlobalStyles';
+import nft_image from '../assets/hero_nfts.png';
+import milky_way from '../assets/milky_way.png';
 
 
 const Wrapper = styled.div`
