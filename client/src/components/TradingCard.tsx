@@ -9,11 +9,12 @@ const Card = styled.div`
   background: #fff;
   border-radius: 15px;
   width: 11rem;
+  height: 18rem;
   background: ${Colors.cardBackground};
-  grid-column-gap: 1rem;
-  grid-row-gap: 1rem;
+  margin: 0.5rem;
 
 `
+
 const Image = styled.img`
   flex: 1;
   object-fit: cover;
@@ -21,11 +22,15 @@ const Image = styled.img`
   aspect-ratio: 1/1;
 `
 
-const Price = styled(SmallText)`
-
+const DataWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.5rem;
 `
 
 type Props = {
+  title: string | undefined
   imgSrc: string | undefined
   priceInEur: string
 }
@@ -35,7 +40,10 @@ export const TradingCard = (props: Props) => {
     <>
       <Card>
         <Image src={props.imgSrc} />
-        <Price>{props.priceInEur}€</Price>
+        <DataWrapper>
+          <SmallText>{props.priceInEur}€</SmallText>
+          <SmallText>{props.title}</SmallText>
+        </DataWrapper>
       </Card>
     </>
   )

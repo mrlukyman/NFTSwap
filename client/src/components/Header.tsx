@@ -1,16 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import { useCallback, useEffect } from 'react'
 import styled from 'styled-components'
-import Modal from 'react-modal'
 import { topbar } from "react-router-loading"
-import { FaUserCircle } from 'react-icons/fa'
-import { FaEthereum } from 'react-icons/fa'
-import { CgClose } from "react-icons/cg"
-import { MetaMaskInpageProvider } from "@metamask/providers"
 import { Nav } from './Nav'
-import { Button } from '../styles/GlobalStyles'
 import { Colors } from '../styles/Colors'
 import { Link } from 'react-router-dom'
-import { Form } from '../components/Form'
+import { userActions } from '../store/userSlice'
+import { useDispatch } from 'react-redux'
+import { gql, useLazyQuery } from '@apollo/client'
+import { ConnectKitButton } from 'connectkit'
+import { useAccount } from 'wagmi'
 
 topbar.config({
   autoRun: true,
@@ -24,26 +22,6 @@ topbar.config({
   shadowColor: 'pink',
   className: 'topbar'
 })
-
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-    background: Colors.background,
-    border: 'none',
-    borderRadius: '15px',
-    transition: 'background-color 0.5s ease',
-  },
-  overlay: {
-    background: 'rgba(0, 0, 0, 0.8)',
-    backdropFilter: 'blur(20px)',
-    transition: 'background-color 0.5s ease',
-  },
-}
 
 const Wrapper = styled.div`
   display: flex;
@@ -64,15 +42,6 @@ const Logo = styled(Link)`
   text-decoration: none;
 `
 
-const WalletButton = styled(Button)`
-  height: 3rem;
-  width: 10rem;
-  background: ${Colors.cardBackground};
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-`
-
 const UserWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -80,171 +49,67 @@ const UserWrapper = styled.div`
   align-items: center;
 `
 
-const UserIcon = styled(FaUserCircle)`
-  border-radius: 50%;
-  border: 3px solid #fff;
-  background: ${Colors.cardBackground};
-  padding: 0.3rem;
-`
-
-const Balance = styled.div`
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #fff;
-  margin: 0 1rem 0 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`
-
-// const usernameInput = styled.input`
-//   height: 3rem;
-//   width: 10rem;
-//   background: rgba(248, 29, 251, 0.05);
-//   border: 1px solid #F81DFB;
-//   color: #fff;
-//   font-size: 14px;
-//   font-weight: 600;
-//   margin-right: 2rem;
-// `
-
-// const DropdownToggle = styled(Dropdown.Toggle)`
-//   background: none;
-//   border: none;
-// `
-
-// const DropdownMenu = styled(Dropdown.Menu)`
-//   display: flex;
-//   flex-direction: column;
-//   flex-wrap: nowrap;
-//   background: #fff;
-//   border-radius: 15px;
-//   padding: 1rem;
-//   margin-top: 1rem;
-//   width: 10rem;
-//   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-// `
-
-declare global {
-  interface Window {
-    ethereum?: MetaMaskInpageProvider | undefined
+const GET_USER = gql`
+  query GetUser($walletAddress: String!) {
+    getUser(walletAddress: $walletAddress) {
+      email
+      name
+      username
+    }
   }
+`
+
+enum LoginState {
+  NOT_LOGGED_IN,
+  NOT_REGISTERED,
+  REGISTERED,
 }
 
-Modal.setAppElement('#root');
-
 export const Header = () => {
-  // const [walletAddress, setWalletAddress] = useState("")
-  // const [status, setStatus] = useState("")
-  const [defaultAccount, setDefaultAccount] = useState("")
-  const [userBalance, setUserBalance] = useState(0)
-  const [modalIsOpen, setModalIsOpen] = useState(false)
-  let subtitle: any
+  const dispatch = useDispatch()
 
-  function openModal() {
-    setModalIsOpen(true)
-  }
+  const [getUser] = useLazyQuery(GET_USER)
 
-  function afterOpenModal() {
-    // references are now sync'd and can be accessed.
-    subtitle.style.color = '#f00';
-  }
+  const { address, isConnected } = useAccount()
 
-  function closeModal() {
-    setModalIsOpen(false)
-  }
-
-  const { ethereum } = window
-
-  const connectWallet = async () => {
-    try {
-      if (!ethereum) {
-        alert("Get MetaMask!")
-        return
-      }
-      const accounts = await ethereum.request({ method: "eth_requestAccounts" })
-      if (accounts instanceof Array) {
-        accountChangedHandler(accounts[0])
-        console.log("Connected", accounts[0])
-        //setWalletAddress(accounts[0])
-      } else {
-        console.log("Connected", accounts)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const handleConnect = useCallback(async (newAccount: any) => {
+    console.log('handleConnect', newAccount)
+    getUser({ variables: { walletAddress: newAccount } })
+      .then(({ data }) => {
+        if (data) {
+          console.log('data', data)
+          if (data.getUser === null) {
+            // setLoginState(LoginState.NOT_REGISTERED)
+            dispatch(userActions.login({
+              email: null,
+              username: null,
+              name: null,
+              walletAddress: newAccount
+            }))
+          } else {
+            // setLoginState(LoginState.REGISTERED)
+            dispatch(userActions.login({
+              email: data.getUser.email,
+              username: data.getUser.username,
+              name: data.getUser.name,
+              walletAddress: newAccount
+            }))
+          }
+        }
+      })
+  }, [dispatch, getUser])
 
   useEffect(() => {
-    if (typeof window.ethereum !== 'undefined') {
-      console.log('MetaMask is installed!')
+    if (isConnected) {
+      handleConnect(address)
     }
-  }, []);
-
-  const accountChangedHandler = (newAccount: any) => {
-    setDefaultAccount(newAccount)
-    getUserBalance(newAccount)
-
-  }
-
-  const getUserBalance = async (address: any) => {
-    if (!ethereum) {
-      console.log("You are not connected!")
-    } else {
-      ethereum.request({ method: 'eth_getBalance', params: [address, 'latest'] })
-        .then((balance: any) => {
-          console.log(balance)
-          const balanceInEth: number = parseInt(balance.toString(), 16) / 1000000000000000000
-          setUserBalance(parseFloat(balanceInEth.toFixed(4)))
-        })
-    }
-  }
-
-  ethereum?.on('accountsChanged', accountChangedHandler)
-
+  }, [address, handleConnect, isConnected])
   return (
     <Wrapper>
       <Logo to="/">NFTswap</Logo>
       <Nav />
       <UserWrapper>
-        {defaultAccount ?
-          <>
-            <Balance>
-              <FaEthereum size="20" />
-              {userBalance}
-            </Balance>
-            <UserIcon size="30" />
-          </>
-          :
-          <WalletButton onClick={openModal}>
-            Connect Wallet
-          </WalletButton>
-        }
-        {/* <FaUserCircle onClick={openModal} size={40} color="#fff" /> */}
-        <Modal
-          isOpen={modalIsOpen}
-          onAfterOpen={afterOpenModal}
-          onRequestClose={closeModal}
-          style={customStyles}
-          contentLabel="Register"
-          closeTimeoutMS={500}
-        >
-          <CgClose onClick={closeModal} size={20} color="#fff" />
-          {/* <h2 ref={(_subtitle) => (subtitle = _subtitle)}>Hello</h2> */}
-          {defaultAccount ?
-            <Form address={defaultAccount} />
-            :
-            <>
-              <WalletButton onClick={connectWallet}>Metamask</WalletButton>
-              <WalletButton>Placeholder</WalletButton>
-              <WalletButton>Placeholder</WalletButton>
-            </>
-          }
-          {/* <form>
-            <input type="text" />
-          </form> */}
-        </Modal>
+        <ConnectKitButton showBalance />
       </UserWrapper>
     </Wrapper>
   )

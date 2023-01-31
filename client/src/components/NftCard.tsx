@@ -12,6 +12,7 @@ const Card = styled.div`
   border-radius: 15px;
   //height: 34rem;
   max-width: 24.5rem;
+  margin: 1rem;
 `
 
 const Wrapper = styled.div`

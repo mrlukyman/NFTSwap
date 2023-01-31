@@ -4,9 +4,16 @@ import { BrowserRouter } from "react-router-dom"
 import App from './App'
 import reportWebVitals from './reportWebVitals'
 import { GlobalStyle } from './styles/GlobalStyles'
-import { ApolloClient, InMemoryCache, ApolloProvider, gql } from '@apollo/client'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import { Provider } from 'react-redux'
+import { store } from './store'
+import { WagmiConfig } from 'wagmi'
+import { ConnectKitProvider } from 'connectkit'
+import { wagmiClient } from './wagmi'
 
-const client = new ApolloClient({
+
+
+const apolloClient = new ApolloClient({
   uri: 'http://localhost:4000/',
   cache: new InMemoryCache(),
 });
@@ -16,12 +23,18 @@ const root = ReactDOM.createRoot(
 )
 root.render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <BrowserRouter>
-        <GlobalStyle />
-        <App />
-      </BrowserRouter>
-    </ApolloProvider>
+    <WagmiConfig client={wagmiClient}>
+      <ConnectKitProvider>
+        <ApolloProvider client={apolloClient}>
+          <Provider store={store}>
+            <BrowserRouter>
+              <GlobalStyle />
+              <App />
+            </BrowserRouter>
+          </Provider>
+        </ApolloProvider>
+      </ConnectKitProvider>
+    </WagmiConfig>
   </React.StrictMode>
 )
 

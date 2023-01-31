@@ -6,20 +6,20 @@ import { useLoadingContext } from 'react-router-loading';
 import { Container } from '../styles/GlobalStyles';
 import { asyncForEach } from '../api/asyncHelper';
 import config from '../config.json';
+import { useSelector } from 'react-redux';
 
 const Wrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
   margin-top: 2rem;
 `
 
 const settings = {
   apiKey: config.ALCHEMY_API_KEY,
-  network: Network.ETH_MAINNET,
+  network: Network.MATIC_MAINNET,
 }
 
 const alchemy = new Alchemy(settings)
@@ -29,13 +29,21 @@ type Nft = OwnedNft & {
 }
 
 export const NftList = () => {
+  const username = useSelector((state: any) => state.user.user.username)
+  const name = useSelector((state: any) => state.user.user.name)
+  const email = useSelector((state: any) => state.user.user.email)
+  const walletAddress = useSelector((state: any) => state.user.user.walletAddress)
+  const isLoggedin = useSelector((state: any) => state.user.isLoggedin)
+
   const [listOfNfts, setListOfNfts] = useState<OwnedNft[]>([]);
   const loadingContext = useLoadingContext();
 
   useEffect(() => {
     const main = async () => {
+
       // Get all NFTs
-      const nfts = await alchemy.nft.getNftsForOwner("effektsvk.eth")
+      const nfts = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress) : { ownedNfts: [] }
+      console.log(nfts)
       // const mappedNfts: Nft[] = []
       // console.log(nfts)
       // await asyncForEach(nfts.ownedNfts, async (nft: OwnedNft) => {
@@ -53,13 +61,14 @@ export const NftList = () => {
       loadingContext.done();
     };
     main();
-  }, [loadingContext])
+  }, [isLoggedin, loadingContext, walletAddress])
   return (
     <Wrapper>
       {
         listOfNfts?.map((nft: OwnedNft) => (
           nft.rawMetadata
             ? <NftCard
+              key={nft.tokenId}
               imgSrc={nft.rawMetadata.image}
               authorImgSrc={nft.rawMetadata.image}
               title={nft.title}
