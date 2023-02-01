@@ -7,8 +7,9 @@ import { Link } from 'react-router-dom'
 import { userActions } from '../store/userSlice'
 import { useDispatch } from 'react-redux'
 import { gql, useLazyQuery } from '@apollo/client'
-import { ConnectKitButton } from 'connectkit'
+import { ConnectKitButton, Avatar } from 'connectkit'
 import { useAccount } from 'wagmi'
+import logo from '../assets/logo.png'
 
 topbar.config({
   autoRun: true,
@@ -34,12 +35,17 @@ const Wrapper = styled.div`
   margin: 1rem 0 3rem 0;
 `
 
-const Logo = styled(Link)`
+const LogoLink = styled(Link)`
   font-size: 3rem;
   font-weight: 600;
   color: #fff;
   margin: 0;
   text-decoration: none;
+`
+
+const Logo = styled.img`
+  width: 3rem;
+  height: 3rem;
 `
 
 const UserWrapper = styled.div`
@@ -58,12 +64,6 @@ const GET_USER = gql`
     }
   }
 `
-
-enum LoginState {
-  NOT_LOGGED_IN,
-  NOT_REGISTERED,
-  REGISTERED,
-}
 
 export const Header = () => {
   const dispatch = useDispatch()
@@ -106,10 +106,13 @@ export const Header = () => {
   }, [address, handleConnect, isConnected])
   return (
     <Wrapper>
-      <Logo to="/">NFTswap</Logo>
+      <LogoLink to="/">
+        <Logo alt="logo" src={logo}></Logo>
+      </LogoLink>
       <Nav />
       <UserWrapper>
         <ConnectKitButton showBalance />
+        <Avatar address={address} size={32} />
       </UserWrapper>
     </Wrapper>
   )
