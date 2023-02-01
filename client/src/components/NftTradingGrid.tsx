@@ -1,6 +1,6 @@
 import { OwnedNft } from "alchemy-sdk";
 import styled from 'styled-components';
-import { TradingCard } from './TradingCard';
+import { NftCard } from "./NftCard";
 
 const Wrapper = styled.div`
   display: flex;
@@ -20,11 +20,12 @@ export const NftTradingList = ({ targetWalletAddressList }: Props) => {
     <Wrapper>
       {
         targetWalletAddressList?.map((nft: OwnedNft) => (
-          nft.rawMetadata
-            ? <TradingCard
-              title={nft.rawMetadata.name}
+          nft.rawMetadata && nft.tokenId !== "0"
+            ? <NftCard
+              key={nft.tokenId}
               imgSrc={nft.rawMetadata.image}
-              priceInEur="1"
+              title={nft.title}
+              priceInEth="1"
             />
             : null
         ))}
