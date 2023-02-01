@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Alchemy, Network, OwnedNft } from "alchemy-sdk"
 import config from '../config.json'
 import styled from 'styled-components'
@@ -38,17 +38,18 @@ export const Trade = () => {
 
   const tradeReceiver = "0xcd92D0e9CCCc52337F78f08c1Af4237624f57c0D"
 
-  useEffect(() => {
-    const main = async () => {
-      if (isLoggedin) {
-        const sender = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress) : { ownedNfts: [] }
-        const receiver = isLoggedin ? await alchemy.nft.getNftsForOwner(tradeReceiver) : { ownedNfts: [] }
-        setSenderList(sender.ownedNfts)
-        setReceiverList(receiver.ownedNfts)
-      }
+  const getNfts = useCallback(async () => {
+    if (isLoggedin) {
+      const sender = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress) : { ownedNfts: [] }
+      const receiver = isLoggedin ? await alchemy.nft.getNftsForOwner(tradeReceiver) : { ownedNfts: [] }
+      setSenderList(sender.ownedNfts)
+      setReceiverList(receiver.ownedNfts)
     }
-    main()
   }, [isLoggedin, walletAddress])
+
+  useEffect(() => {
+    getNfts();
+  }, [getNfts])
   return (
 
     <Container>

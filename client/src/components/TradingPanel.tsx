@@ -1,14 +1,11 @@
-import React, { Provider, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { Colors } from '../styles/Colors'
 import { SmallText } from '../styles/GlobalStyles'
 import { Button } from '../styles/GlobalStyles'
 import { useSelector } from 'react-redux'
 import config from '../config.json'
-import { Alchemy, Network, OwnedNft, OwnedNftsResponse } from "alchemy-sdk"
-import { NftSwap } from '@traderxyz/nft-swap-sdk';
-import detectEthereumProvider from '@metamask/detect-provider';
-import { BaseProvider } from '@ethersproject/providers'
+import { Alchemy, Network, OwnedNft } from "alchemy-sdk"
 
 const Wrapper = styled.div`
   width: 10rem;
