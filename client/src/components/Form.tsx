@@ -80,6 +80,9 @@ export const Form = () => {
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
+    if (!email || !username || !name || !walletAddress) return ( //TODO: add better validation of each input field___)_
+      alert('Please fill all the fields')
+    )
     createUser({
       variables: {
         email,
@@ -98,8 +101,7 @@ export const Form = () => {
       })
       .catch((err) => {
         console.log(err)
-      }
-      )
+      })
   }
 
   return (
