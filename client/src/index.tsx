@@ -11,7 +11,12 @@ import { WagmiConfig } from 'wagmi'
 import { ConnectKitProvider } from 'connectkit'
 import { wagmiClient } from './wagmi'
 
-
+const customTheme = {
+  '--ck-connectbutton-background': `linear-gradient(160.61deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 101.7%)`,
+  '--ck-connectbutton-hover-background': `linear-gradient(160.61deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 101.7%)`,
+  '--ck-body-background': `linear-gradient(160.61deg, rgba(42, 42, 42, 0.9) 0%, rgba(97, 97, 97, 0.6) 101.7%)`,
+  '--ck-overlay-backdrop-filter': `blur(1rem)`,
+}
 
 const apolloClient = new ApolloClient({
   uri: 'http://localhost:4000/',
@@ -24,7 +29,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <WagmiConfig client={wagmiClient}>
-      <ConnectKitProvider>
+      <ConnectKitProvider customTheme={customTheme} >
         <ApolloProvider client={apolloClient}>
           <Provider store={store}>
             <BrowserRouter>

@@ -1,17 +1,16 @@
-import React from 'react';
-import { NftList } from '../components/NftList';
 import { Header } from '../components/Header';
 import { Hero } from '../components/Hero';
-import { SupportedWallets } from '../SupportedWallets';
-//import { Trade } from './Trade';
 import { Container } from '../styles/GlobalStyles';
+import { Footer } from '../components/Footer';
 
 export const Home = () => {
   return (
-    <Container>
-      <Header />
-      <Hero />
-      <SupportedWallets />
-    </Container>
-  );
+    <>
+      <Container>
+        <Header />
+        <Hero />
+      </Container>
+      <Footer />
+    </>
+  )
 }

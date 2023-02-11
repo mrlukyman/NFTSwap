@@ -22,6 +22,7 @@ export const NftTradingList = ({ targetWalletAddressList }: Props) => {
         targetWalletAddressList?.map((nft: OwnedNft) => (
           nft.rawMetadata && nft.tokenId !== "0"
             ? <NftCard
+              interactive={true}
               key={nft.tokenId}
               imgSrc={nft.rawMetadata.image}
               title={nft.title}

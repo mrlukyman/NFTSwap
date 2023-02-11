@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { Button } from '../styles/GlobalStyles'
 import { Colors } from '../styles/Colors'
+import { useNavigate } from 'react-router-dom'
+import { useGetUser } from '../api/getUser'
+import { Input } from '../styles/GlobalStyles'
 
 const CREATE_USER = gql`
   mutation createUser($email: String!, $username: String!, $name: String!, $walletAddress: String!) {
@@ -20,33 +23,14 @@ const CREATE_USER = gql`
 
 const FormWrapper = styled.form`
   display: flex;
+  width: 30rem;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 25rem;
-  margin: 2rem;
-`
-
-const Input = styled.input`
-  width: 100%;
-  height: 3rem;
-  color: #fff;
-  margin: 10px 0;
-  padding: 0 10px;
-  border-radius: 15px;
-  border: 1px solid #F81DFB;
-  background: ${Colors.cardBackground};
-  border-radius: 5px;
-  font-size: 16px;
-  &:disabled {
-    background: ${Colors.cardBackground};
-    color: #ffffff88;
-    border: none;
-  }
+  margin:2rem;
 `
 
 const RegisterButton = styled(Button)`
-  transition: 0.36s ease-in;
   border-radius: 15px;
   border: 1px solid #F81DFB;
   height: 3rem;
@@ -62,25 +46,30 @@ const RegisterButton = styled(Button)`
   align-items: center;
   margin-top: 0.5rem;
   &:hover {
+    cursor: pointer;
     box-shadow: 0px 0px 1rem 0px rgba(248,29,251,0.75);
     -webkit-box-shadow: 0px 0px 1rem 0px rgba(248,29,251,0.75);
     -moz-box-shadow: 0px 0px 1rem 0px rgba(248,29,251,0.75);
+    transition: 0.36s ease-in;
+    transform: scale(1.01);
   }
 `
 
 export const Form = () => {
   const dispatch = useDispatch()
-  const [email, setEmail] = useState('')
-  const [username, setUsername] = useState('')
-  const [name, setName] = useState('')
+  const [email, setEmail] = useState('lukasharing123@gmail.com')
+  const [username, setUsername] = useState('mrlukyman')
+  const [name, setName] = useState('Lukas Haring')
   const address = useSelector((state: any) => state.user.user.walletAddress)
-  const [walletAddress, setWalletAddress] = useState(address)
+  const [walletAddress, setWalletAddress] = useState(address || '')
+  const navigate = useNavigate()
+  const { getUser } = useGetUser()
+
 
   const [createUser] = useMutation(CREATE_USER)
 
   const handleSubmit = (e: any) => {
-    e.preventDefault()
-    if (!email || !username || !name || !walletAddress) return ( //TODO: add better validation of each input field___)_
+    if (!email || !username || !name || !walletAddress) return ( //TODO: add better validation of each input field
       alert('Please fill all the fields')
     )
     createUser({
@@ -102,6 +91,7 @@ export const Form = () => {
       .catch((err) => {
         console.log(err)
       })
+    navigate('/profile') //TODO: make this not glitchy
   }
 
   return (

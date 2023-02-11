@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import { TradingPanel } from '../components/TradingPanel'
 import { Header } from '../components/Header'
 import { Container, Text } from '../styles/GlobalStyles'
-import { NftTradingList } from '../components/NftTradingGrid'
 import { useSelector } from 'react-redux'
 
 const settings = {
@@ -18,12 +17,12 @@ const alchemy = new Alchemy(settings)
 const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  flex: 1;
 `
 
 const TradingPanelWrapper = styled(Container)`
   display: flex;
-  flex: 1;
+  flex-shrink: 0;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -51,17 +50,17 @@ export const Trade = () => {
     getNfts();
   }, [getNfts])
   return (
-
     <Container>
       <Header />
-      {isLoggedin ? (
-        <Wrapper>
-          <NftTradingList targetWalletAddressList={senderList} />
-          <TradingPanel />
-          <NftTradingList targetWalletAddressList={receiverList} />
-        </Wrapper>
-      )
-        : (
+      {isLoggedin
+        ?
+        (
+          <Wrapper>
+            <TradingPanel />
+          </Wrapper>
+        )
+        :
+        (
           <TradingPanelWrapper>
             <Text>Please connect your wallet</Text>
           </TradingPanelWrapper>

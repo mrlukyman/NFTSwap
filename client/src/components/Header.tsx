@@ -6,10 +6,12 @@ import { Colors } from '../styles/Colors'
 import { Link } from 'react-router-dom'
 import { userActions } from '../store/userSlice'
 import { useDispatch } from 'react-redux'
-import { gql, useLazyQuery } from '@apollo/client'
-import { ConnectKitButton, Avatar } from 'connectkit'
+import { gql } from '@apollo/client'
+import { ConnectKitButton } from 'connectkit'
 import { useAccount } from 'wagmi'
 import logo from '../assets/logo.png'
+import { useNavigate } from "react-router-dom";
+import { useGetUser } from '../api/getUser'
 
 topbar.config({
   autoRun: true,
@@ -67,27 +69,27 @@ const GET_USER = gql`
 
 export const Header = () => {
   const dispatch = useDispatch()
-
-  const [getUser] = useLazyQuery(GET_USER)
-
+  // const [getUser] = useLazyQuery(GET_USER)
+  const { getUser } = useGetUser()
   const { address, isConnected } = useAccount()
+  const navigate = useNavigate()
 
-  const handleConnect = useCallback(async (newAccount: any) => {
-    console.log('handleConnect', newAccount)
+
+  const handleConnect = useCallback(async (newAccount: string | undefined) => {
     getUser({ variables: { walletAddress: newAccount } })
       .then(({ data }) => {
         if (data) {
           console.log('data', data)
           if (data.getUser === null) {
-            // setLoginState(LoginState.NOT_REGISTERED)
             dispatch(userActions.login({
               email: null,
               username: null,
               name: null,
               walletAddress: newAccount
             }))
+            console.log('redirecting')
+            navigate("/register")
           } else {
-            // setLoginState(LoginState.REGISTERED)
             dispatch(userActions.login({
               email: data.getUser.email,
               username: data.getUser.username,
@@ -97,13 +99,15 @@ export const Header = () => {
           }
         }
       })
-  }, [dispatch, getUser])
+  }, [dispatch, getUser, navigate])
 
   useEffect(() => {
     if (isConnected) {
       handleConnect(address)
+    } else {
+      dispatch(userActions.logout())
     }
-  }, [address, handleConnect, isConnected])
+  }, [address, dispatch, handleConnect, isConnected])
   return (
     <Wrapper>
       <LogoLink to="/">
@@ -111,8 +115,7 @@ export const Header = () => {
       </LogoLink>
       <Nav />
       <UserWrapper>
-        <ConnectKitButton showBalance />
-        <Avatar address={address} size={32} />
+        <ConnectKitButton />
       </UserWrapper>
     </Wrapper>
   )
