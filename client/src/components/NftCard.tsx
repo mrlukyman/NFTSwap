@@ -1,85 +1,97 @@
 import styled from 'styled-components';
 import { FaEthereum } from 'react-icons/fa'
-import { Text } from '../styles/GlobalStyles'
+import { SmallText, MediumText } from '../styles/GlobalStyles'
+import { nftListType } from '../types/basicTypes'
 
 const Card = styled.div`
   display: flex;
   flex: 1;
-  width: 100%;
-  height: 100%;
-  max-width: 25rem;
   flex-direction: column;
-  border-radius: 16px;
-  margin-right: 1rem;
+  border-radius: 1rem;
   position: relative;
+  &:hover{
+    cursor: pointer;
+    ${({ interactive }: nftListType) => interactive === true && ('transform: translateY(-0.4rem); transition: transform 0.2s ease-in-out;')}
+  }
+  
 `
 
 const Image = styled.img`
   flex: 1;
   object-fit: cover;
-  border-radius: 15px;
-  width: 100%;
-  height: 100%;
-  
+  border-radius: 1rem;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+
+`
+
+const Video = styled.video`
+  flex: 1;
+  object-fit: cover;
+  border-radius: 1rem;
+  aspect-ratio: 1/1;
 `
 
 const Shadow = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
   height: 100%;
-  max-height: 100%;
-  max-width: 100%;
-  border-radius: 16px;
-
+  width: 100%;
+  border-radius: 1rem;
   background: linear-gradient(rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.8) 100%);
-`
-
-const Video = styled.video`
-  flex: 1;
-  object-fit: cover;
-  border-radius: 16px;
-  width: 100%;
-  height: 100%;
 `
 
 const BottomPartWrapper = styled.div`
   position: absolute;
-  gap: 2px;
   bottom: 0px;
-  padding-bottom: 12px;
+  padding-bottom: 1rem;
   z-index: 1;
-  padding-left: 16px;
+  padding-left: 1rem;
 `
 
-const PriceInEth = styled.p`
-  font-size: 20px;
-  font-weight: 600;
-  color: #fff;
+const PriceInEth = styled(SmallText)`
   margin: 0;
   display: flex;
   align-items: center;
-  margin-top: 0.2rem;
+`
+
+const PriceWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 type Props = {
   imgSrc: string | undefined
   title: string
   priceInEth: string | undefined
+  interactive?: boolean
 }
 
-export const NftCard = ({ imgSrc, title, priceInEth }: Props) => {
+export const NftCard = ({ imgSrc, title, priceInEth, interactive }: Props) => {
   return (
-    <Card>
+    <Card interactive={interactive}>
       <Shadow />
-      {imgSrc?.includes('mp4') ? <Video src={imgSrc} autoPlay loop muted /> : <Image src={imgSrc} />}
+      {
+        imgSrc?.includes('mp4')
+          ?
+          <Video src={imgSrc} autoPlay loop muted />
+          :
+          <Image src={imgSrc?.includes('ipfs')
+            ?
+            imgSrc.replace('ipfs://', 'https://ipfs.io/ipfs/')
+            :
+            imgSrc}
+          />
+      }
       <BottomPartWrapper>
-        <Text>{title}</Text>
-        <PriceInEth>
-          {priceInEth}
+        <MediumText>{title}</MediumText>
+        <PriceWrapper>
+          <PriceInEth>
+            floor price: {priceInEth}
+          </PriceInEth>
           <FaEthereum />
-        </PriceInEth>
+        </PriceWrapper>
       </BottomPartWrapper>
     </Card>
   );

@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-loading";
 import { Home } from './pages/Home';
 import { Trade } from './pages/Trade';
 import { Profile } from './pages/Profile';
+import { Register } from './pages/Register';
 import { Container } from './styles/GlobalStyles';
 
 function App() {
@@ -12,7 +13,8 @@ function App() {
       <Container>
         <Route path="/" element={<Home />} />
         <Route path="trade" element={<Trade />} />
-        <Route path="profile" element={<Profile />} loading />
+        <Route path="profile" element={<Profile />} />
+        <Route path="register" element={<Register />} />
       </Container>
     </Routes>
   );
