@@ -11,7 +11,7 @@ import { ConnectKitButton } from 'connectkit'
 import { useAccount } from 'wagmi'
 import logo from '../assets/logo.png'
 import { useNavigate } from "react-router-dom";
-import { useGetUser } from '../api/getUser'
+import { useGetUser } from '../api/hooks/useGetUser'
 
 topbar.config({
   autoRun: true,
@@ -57,23 +57,11 @@ const UserWrapper = styled.div`
   align-items: center;
 `
 
-const GET_USER = gql`
-  query GetUser($walletAddress: String!) {
-    getUser(walletAddress: $walletAddress) {
-      email
-      name
-      username
-    }
-  }
-`
-
 export const Header = () => {
   const dispatch = useDispatch()
-  // const [getUser] = useLazyQuery(GET_USER)
   const { getUser } = useGetUser()
   const { address, isConnected } = useAccount()
   const navigate = useNavigate()
-
 
   const handleConnect = useCallback(async (newAccount: string | undefined) => {
     getUser({ variables: { walletAddress: newAccount } })

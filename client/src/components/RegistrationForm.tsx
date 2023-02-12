@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { Button } from '../styles/GlobalStyles'
 import { Colors } from '../styles/Colors'
 import { useNavigate } from 'react-router-dom'
-import { useGetUser } from '../api/getUser'
+import { useGetUser } from '../api/hooks/useGetUser'
 import { Input } from '../styles/GlobalStyles'
 
 const CREATE_USER = gql`
@@ -55,11 +55,11 @@ const RegisterButton = styled(Button)`
   }
 `
 
-export const Form = () => {
+export const RegistrationForm = () => {
   const dispatch = useDispatch()
-  const [email, setEmail] = useState('lukasharing123@gmail.com')
-  const [username, setUsername] = useState('mrlukyman')
-  const [name, setName] = useState('Lukas Haring')
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [name, setName] = useState('')
   const address = useSelector((state: any) => state.user.user.walletAddress)
   const [walletAddress, setWalletAddress] = useState(address || '')
   const navigate = useNavigate()

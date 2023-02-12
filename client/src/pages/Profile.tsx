@@ -5,7 +5,6 @@ import { Header } from '../components/Header'
 import { NftList } from "../components/NftList"
 import { Container } from '../styles/GlobalStyles'
 import { Text } from '../styles/GlobalStyles'
-import { Form } from '../components/Form'
 import profile_background from '../assets/profile_background.png'
 import { Footer } from '../components/Footer'
 

@@ -70,7 +70,7 @@ export const Input = styled.input`
   margin: 1rem 0;
   padding: 0 0.5rem;
   border-radius: 1rem;
-  border: 1px solid #f71dfb84;
+  border: 1px solid #f71dfb54;
   background: ${Colors.cardBackground};
   font-size: 1rem;
   &:disabled {
@@ -82,12 +82,13 @@ export const Input = styled.input`
     outline: none;
     border: 1px solid #F81DFB;
     transition: 0.36s ease-out;
+    transform: scale(1.01);
     box-shadow: 0px 0px 1rem 0px rgba(248,29,251,0.75);
   }
 `
 
 export const Button = styled.button`
-  transition: 0.36s ease-in;
+  transition: 0.36s ease-in-out;
   border-radius: 1rem;
   border: 1px solid #F81DFB;
   cursor: pointer;
