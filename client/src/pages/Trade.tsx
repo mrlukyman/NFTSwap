@@ -29,26 +29,9 @@ const TradingPanelWrapper = styled(Container)`
 `
 
 export const Trade = () => {
-  const walletAddress = useSelector((state: any) => state.user.user.walletAddress)
   const isLoggedin = useSelector((state: any) => state.user.isLoggedin)
+  const receiver = useSelector((state: any) => state.user.user.walletAddress)
 
-  const [senderList, setSenderList] = useState<OwnedNft[]>([])
-  const [receiverList, setReceiverList] = useState<OwnedNft[]>([])
-
-  const tradeReceiver = "0xcd92D0e9CCCc52337F78f08c1Af4237624f57c0D"
-
-  const getNfts = useCallback(async () => {
-    if (isLoggedin) {
-      const sender = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress) : { ownedNfts: [] }
-      const receiver = isLoggedin ? await alchemy.nft.getNftsForOwner(tradeReceiver) : { ownedNfts: [] }
-      setSenderList(sender.ownedNfts)
-      setReceiverList(receiver.ownedNfts)
-    }
-  }, [isLoggedin, walletAddress])
-
-  useEffect(() => {
-    getNfts();
-  }, [getNfts])
   return (
     <Container>
       <Header />

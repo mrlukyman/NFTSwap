@@ -3,14 +3,15 @@ import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import { Alchemy, Network, OwnedNft } from "alchemy-sdk"
 import Select from 'react-select'
-import { useQuery, gql } from '@apollo/client'
 import { NftList } from './NftList'
 import config from '../config.json'
-import { Input } from '../styles/GlobalStyles'
 import { Button } from '../styles/GlobalStyles'
-import { SmallText, Text } from '../styles/GlobalStyles'
+import { SmallText } from '../styles/GlobalStyles'
 import { Colors } from '../styles/Colors'
-import { getFragmentQueryDocument } from '@apollo/client/utilities'
+import { ProfileSearch } from './ProfileSearch'
+import { receiverType } from '../types/basicTypes'
+import { useDispatch } from 'react-redux'
+import { removeReceiverAddress } from '../store/tradeSlice'
 
 const Wrapper = styled.div`
   display: flex;
@@ -21,6 +22,7 @@ const Wrapper = styled.div`
   max-height: content;
   position: relative;
   height: 85vh;
+  box-shadow: 0 0 1rem 0 rgba(0, 0, 0, 0.4);
 `
 
 const NftListWrapper = styled.div`
@@ -70,18 +72,19 @@ const SelectButton = styled(Button)`
   color: #fff;
   font-size: 14px;
   font-weight: 600;
+  border: 1px solid #ffffff3d;
   &:hover {
     box-shadow: none;
   }
-  &:first-child {
-    border-radius: 0.5rem 0 0 0.5rem;
+  &:nth-child(2) {
+    border-radius: 0;
     background: linear-gradient(90deg,rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.06) 100%);
   }
   &:last-child {
     border-radius: 0 0.5rem 0.5rem 0;
     background: linear-gradient(90deg,rgba(255, 255, 255, 0.06)  0%, rgba(255, 255, 255, 0.15) 100%);
   }
-  &:first-child:hover {
+  &:nth-child(2):hover {
     background: linear-gradient(90deg,rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.06) 100%);
   }
   &:last-child:hover {
@@ -96,25 +99,22 @@ const SelectorWrapper = styled.div`
   margin: 0.5rem 0 0.5rem 0;
 `
 
-const AddressWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
+const GoBackButton = styled(Button)`
+  background: linear-gradient(90deg,rgba(255, 255, 255, 0.06)  0%, rgba(255, 255, 255, 0.15) 100%);
+  width: 3rem;
+  height: 3rem;
+  border: 1px solid #ffffff3d;
+  border-radius: 0.5rem 0 0 0.5rem;
+  color: #fff;
+  font-size: 1.5rem;
+  &:hover {
+    box-shadow: none;
+    background: linear-gradient(90deg,rgba(255, 255, 255, 0.06)  0%, rgba(255, 255, 255, 0.3) 100%);
+  }
 `
-
-const FormWrapper = styled.form`
-  display: flex;
-  width: 30rem;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`
-
 
 const customStyles = {
-  control: (base: any, state: any) => ({
+  control: (base: any) => ({
     ...base,
     width: 500,
     height: "3rem",
@@ -127,139 +127,102 @@ const customStyles = {
   }),
 }
 
-const GET_USERS = gql`
-  query Query {
-    getUsers {
-      walletAddress
-      username
-    }
-  }
-`
+
 
 const settings = {
   apiKey: config.ALCHEMY_API_KEY,
   network: Network.MATIC_MAINNET,
 }
 
+enum NftListSwitch {
+  MY_NFTS,
+  THEIR_NFTS,
+}
+
 const alchemy = new Alchemy(settings)
 
+
 export const TradingPanel = () => {
-  const walletAddress = useSelector((state: any) => state.user.user.walletAddress)
+  const dispatch = useDispatch()
+  const senderAddress = useSelector((state: any) => state.user.user.walletAddress)
   const isLoggedin = useSelector((state: any) => state.user.isLoggedin)
+  const isSubmitted = useSelector((state: any) => state.trade.isSubmitted)
+  const receiver = useSelector((state: any) => state.trade.receiverAddress)
   const [tokenAddress, setTokenAddress] = useState('')
   const [tokenId, setTokenId] = useState('')
   const [type, setType] = useState('')
-  const [nft, setNft] = useState<OwnedNft>()
-  const [transferAddress, setTransferAddress] = useState('0xa6f7eC2379d06fE18d78db1789f612238c3a3b99')
   // state for controlling which button is selected
-  const [selected, setSelected] = useState('MyNFTs') //TODO: make better handeling of this
-  const [userAddresses, setUserAddresses] = useState<any[]>([ //TODO: make this work
-    {
-      value: "",
-      label: "",
-    },
-
-  ])
-
-  const { data, loading, error } = useQuery(GET_USERS)
+  const [selected, setSelected] = useState(NftListSwitch.MY_NFTS)
 
   const [listOfNfts, setListOfNfts] = useState<OwnedNft[]>([])
+  const receiverAddress = receiver
+  console.log(receiverAddress)
 
-  const getAddresses = useCallback(async () => {
-    if (data) {
-      const addresses = data.getUsers.map((user: any) => {
-        return {
-          value: user.walletAddress,
-          label: user.username,
-        }
-      })
-      setUserAddresses(addresses)
-    }
-  }, [data])
+  const handleMyNftsClicked = useCallback(async () => {
+    setSelected(NftListSwitch.MY_NFTS)
+    const myNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(senderAddress) : { ownedNfts: [] }
+    setListOfNfts(myNfts.ownedNfts)
+    setTokenAddress(myNfts.ownedNfts[0].contract.address)
+    setTokenId(myNfts.ownedNfts[0].tokenId)
+    setType(myNfts.ownedNfts[0].tokenType)
+    // console.log(myNfts.ownedNfts)
+  }, [isLoggedin, senderAddress])
 
+  const handleTheirNftsClicked = useCallback(async () => {
+    setSelected(NftListSwitch.THEIR_NFTS)
+    const theirNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(receiver) : { ownedNfts: [] }
+    setListOfNfts(theirNfts.ownedNfts)
+  }, [isLoggedin, receiver])
 
-  const getNfts = useCallback(async () => {
-    if (isLoggedin) {
-      const myNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress) : { ownedNfts: [] }
-      const theirNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(transferAddress) : { ownedNfts: [] }
-      selected === 'MyNFTs' ? setListOfNfts(myNfts.ownedNfts) : setListOfNfts(theirNfts.ownedNfts)
-      setTokenAddress(myNfts.ownedNfts[0].contract.address)
-      setTokenId(myNfts.ownedNfts[0].tokenId)
-      setType(myNfts.ownedNfts[0].tokenType)
-      console.log(myNfts.ownedNfts)
-    }
-  }, [isLoggedin, selected, transferAddress, walletAddress])
-
-  const handleAddressSubmit = (e: any) => {
-    e.preventDefault()
-    setTransferAddress(e.target.value)
-  }
-
-  const handleMyNftsClicked = () => {
-    setSelected('MyNFTs')
-    getNfts()
-  }
-
-  const handleTheirNftsClicked = () => {
-    setSelected('TheirNFTs')
-    getNfts()
+  const handleBack = () => {
+    dispatch(removeReceiverAddress())
+    setSelected(NftListSwitch.MY_NFTS)
   }
 
   useEffect(() => {
-    getAddresses()
-    getNfts()
-  }, [getAddresses, getNfts])
-
+    handleMyNftsClicked()
+  }, [handleMyNftsClicked])
   return (
-    <Wrapper>
-      {transferAddress ? (
-        <>
-          <NftListWrapper>
-            <SelectorWrapper>
-              <SelectButton onClick={handleMyNftsClicked}>My NFTs</SelectButton>
-              <SelectButton onClick={handleTheirNftsClicked}>Their NFTs</SelectButton>
-            </SelectorWrapper>
-            {selected === 'MyNFTs' ? (
-              <NftList interactive />
-            ) : (
-              <NftList nftList={listOfNfts} interactive />
-            )
-            }
-          </NftListWrapper>
-          <TrdingPanel>
-            <SmallText>Token Address</SmallText>
-            <input
-              value={tokenAddress}
-              onChange={(e) => setTokenAddress(e.target.value)}
-            />
-            <SmallText>Token Id</SmallText>
-            <input
-              value={tokenId}
-              onChange={(e) => setTokenId(e.target.value)}
-            />
-            <SmallText>Type</SmallText>
-            <input
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-            />
-            <TradeButton>Trade</TradeButton>
-          </TrdingPanel>
-        </>
-      ) : (
-        <AddressWrapper>
-          <Text>Transfer Address</Text>
-          <SmallText>Enter the address of the wallet you want to trade with</SmallText>
-          <FormWrapper onSubmit={handleAddressSubmit}>
-            <Select
-              styles={customStyles}
-              value={transferAddress}
-              options={userAddresses}
-              placeholder='0x...'
-            />
-            <TradeButton type='submit'>Trade</TradeButton>
-          </FormWrapper>
-        </AddressWrapper>
-      )}
-    </Wrapper>
+    <>
+      <Wrapper>
+        {isSubmitted ? (
+          <>
+            <NftListWrapper>
+              <SelectorWrapper>
+                <GoBackButton onClick={handleBack}>&lt;</GoBackButton>
+                <SelectButton onClick={handleMyNftsClicked}>My NFTs</SelectButton>
+                <SelectButton onClick={handleTheirNftsClicked}>Their NFTs</SelectButton>
+              </SelectorWrapper>
+              {selected === NftListSwitch.MY_NFTS ? (
+                <NftList interactive />
+              ) : (
+                <NftList nftList={listOfNfts} interactive />
+              )
+              }
+            </NftListWrapper>
+            <TrdingPanel>
+              <SmallText>Token Address</SmallText>
+              <input
+                value={tokenAddress}
+                onChange={(e) => setTokenAddress(e.target.value)}
+              />
+              <SmallText>Token Id</SmallText>
+              <input
+                value={tokenId}
+                onChange={(e) => setTokenId(e.target.value)}
+              />
+              <SmallText>Type</SmallText>
+              <input
+                value={type}
+                onChange={(e) => setType(e.target.value)}
+              />
+              <TradeButton>Trade</TradeButton>
+            </TrdingPanel>
+          </>
+        ) : (
+          <ProfileSearch />
+        )}
+      </Wrapper>
+    </>
   )
 }
