@@ -51,7 +51,7 @@ export const Profile = () => {
               <Username>@{username}</Username>
             </UserDataWrapper>
             <Text>Your NFTs</Text>
-            <NftList interactive />
+            <NftList />
           </>
         ) : (
           <Text>Please login to view your profile</Text>
