@@ -11,7 +11,7 @@ import { Colors } from '../styles/Colors'
 import { ProfileSearch } from './ProfileSearch'
 import { receiverType } from '../types/basicTypes'
 import { useDispatch } from 'react-redux'
-import { removeReceiverAddress } from '../store/tradeSlice'
+import { removeReceiverAddress } from '../store/receiverSlice'
 
 const Wrapper = styled.div`
   display: flex;
@@ -127,8 +127,6 @@ const customStyles = {
   }),
 }
 
-
-
 const settings = {
   apiKey: config.ALCHEMY_API_KEY,
   network: Network.MATIC_MAINNET,
@@ -200,6 +198,9 @@ export const TradingPanel = () => {
               )
               }
             </NftListWrapper>
+            <MyNftList>
+              <NftList nftList={listOfNfts} interactive />
+            </MyNftList>
             <TrdingPanel>
               <SmallText>Token Address</SmallText>
               <input

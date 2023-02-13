@@ -4,7 +4,7 @@ import { useDebounce } from 'use-debounce'
 import Fuse from 'fuse.js'
 import { useQuery, gql, useLazyQuery } from '@apollo/client'
 import { receiverType } from '../types/basicTypes'
-import { setReceiverAddress, removeReceiverAddress } from '../store/tradeSlice'
+import { setReceiverAddress, removeReceiverAddress } from '../store/receiverSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { Colors } from '../styles/Colors'
@@ -116,9 +116,12 @@ export const ProfileSearch = () => {
             return null
           }
           return (
-            <ButtonWrapper onClick={(e: any) => handleAddressSubmit(e, result.walletAddress)}> {/* TODO: This shouldn't be wrapped in a button I think.. think of a way to add the on click event on the component */}
-              <ProfileSearchCard key={result.walletAddress} username={result.username} walletAddress={result.walletAddress} />
-            </ButtonWrapper>
+            <ProfileSearchCard
+              key={result.walletAddress}
+              handleAddressSubmit={(e: React.MouseEvent<HTMLElement>) =>
+                handleAddressSubmit(e, result.walletAddress)}
+              username={result.username} walletAddress={result.walletAddress}
+            />
           )
         })}
       </FormWrapper>
