@@ -37,18 +37,19 @@ const Wrapper = styled.button`
 type ProfileSearchProps = {
   username: string
   walletAddress: `0x${string}` | undefined
+  handleAddressSubmit: (e: React.MouseEvent<HTMLElement>, walletAddress: `0x${string}` | undefined) => void
 }
 
 
 
 
-export const ProfileSearchCard = ({ username, walletAddress }: ProfileSearchProps) => {
+export const ProfileSearchCard = ({ username, walletAddress, handleAddressSubmit }: ProfileSearchProps) => {
   const { data, isError, isLoading } = useEnsAvatar({
     //@ts-ignore
     address: walletAddress,
   })
   return (
-    <Wrapper>
+    <Wrapper onClick={(e: React.MouseEvent<HTMLElement>) => handleAddressSubmit(e, walletAddress)}>
       <img src='https://picsum.photos/50' alt={username} />
       <p>@{username}</p>
     </Wrapper>
