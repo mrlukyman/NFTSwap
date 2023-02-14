@@ -53,7 +53,7 @@ export const MediumText = styled.p`
 export const Text = styled.p`
   font-size: 1.563rem;
   font-weight: 400;
-  margin: 0.5rem 0;
+  margin: 0 0 0.5rem 0;
 `
 
 export const SmallText = styled.p`

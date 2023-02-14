@@ -4,7 +4,7 @@ import { useDebounce } from 'use-debounce'
 import Fuse from 'fuse.js'
 import { useQuery, gql, useLazyQuery } from '@apollo/client'
 import { receiverType } from '../types/basicTypes'
-import { setReceiverAddress, removeReceiverAddress } from '../store/receiverSlice'
+import { setReceiverInfo, removeReceiverInfo } from '../store/receiverSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { Colors } from '../styles/Colors'
@@ -91,11 +91,11 @@ export const ProfileSearch = () => {
     getAddresses()
   }, [getAddresses])
 
-  const handleAddressSubmit = (e: any, walletAddress: string) => {
+  const handleAddressSubmit = (e: any, walletAddress: string, username: string) => {
     e.preventDefault()
     console.log(walletAddress)
     if (walletAddress) {
-      dispatch(setReceiverAddress(walletAddress))
+      dispatch(setReceiverInfo({ walletAddress: walletAddress, username: username }))
     } else {
       alert('Please enter a valid username or an address')
     }
@@ -119,7 +119,7 @@ export const ProfileSearch = () => {
             <ProfileSearchCard
               key={result.walletAddress}
               handleAddressSubmit={(e: React.MouseEvent<HTMLElement>) =>
-                handleAddressSubmit(e, result.walletAddress)}
+                handleAddressSubmit(e, result.walletAddress, result.username)}
               username={result.username} walletAddress={result.walletAddress}
             />
           )

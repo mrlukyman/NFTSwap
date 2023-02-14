@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { gql, useMutation } from '@apollo/client'
-import { userActions } from '../store/userSlice'
+import { login } from '../store/userSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { Button } from '../styles/GlobalStyles'
@@ -81,7 +81,7 @@ export const RegistrationForm = () => {
       },
     })
       .then(({ data }) => {
-        dispatch(userActions.login({
+        dispatch(login({
           email: data.createUser.email,
           username: data.createUser.username,
           name: data.createUser.name,

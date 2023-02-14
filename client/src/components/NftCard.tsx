@@ -13,7 +13,6 @@ const Card = styled.div`
     cursor: pointer;
     ${({ interactive }: nftListType) => interactive === true && ('transform: translateY(-0.4rem); transition: transform 0.2s ease-in-out;')}
   }
-  
 `
 
 const Image = styled.img`
@@ -63,15 +62,16 @@ const PriceWrapper = styled.div`
 
 type Props = {
   imgSrc: string | undefined
-  title: string
+  title: string | undefined
   priceInEth: string | undefined
   interactive?: boolean
+  showShadow?: boolean
 }
 
-export const NftCard = ({ imgSrc, title, priceInEth, interactive }: Props) => {
+export const NftCard = ({ imgSrc, title, priceInEth, interactive, showShadow }: Props) => {
   return (
     <Card interactive={interactive}>
-      <Shadow />
+      {showShadow === false ? null : <Shadow />}
       {
         imgSrc?.includes('mp4')
           ?
@@ -87,12 +87,16 @@ export const NftCard = ({ imgSrc, title, priceInEth, interactive }: Props) => {
       <BottomPartWrapper>
         <MediumText>{title}</MediumText>
         <PriceWrapper>
-          <PriceInEth>
-            floor price: {priceInEth}
-          </PriceInEth>
-          <FaEthereum />
+          {priceInEth &&
+            <>
+              <PriceInEth>
+                floor pice: {priceInEth}
+              </PriceInEth>
+              <FaEthereum />
+            </>
+          }
         </PriceWrapper>
       </BottomPartWrapper>
     </Card>
-  );
+  )
 }

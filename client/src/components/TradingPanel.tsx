@@ -5,13 +5,13 @@ import { Alchemy, Network, OwnedNft } from "alchemy-sdk"
 import Select from 'react-select'
 import { NftList } from './NftList'
 import config from '../config.json'
-import { Button } from '../styles/GlobalStyles'
+import { Button, MediumText, Text, Title } from '../styles/GlobalStyles'
 import { SmallText } from '../styles/GlobalStyles'
 import { Colors } from '../styles/Colors'
 import { ProfileSearch } from './ProfileSearch'
 import { receiverType } from '../types/basicTypes'
 import { useDispatch } from 'react-redux'
-import { removeReceiverAddress } from '../store/receiverSlice'
+import { removeReceiverInfo } from '../store/receiverSlice'
 
 const Wrapper = styled.div`
   display: flex;
@@ -29,11 +29,9 @@ const NftListWrapper = styled.div`
   display: flex;
   flex: 1;
   flex-direction: column;
-  border-radius: 1rem;
+  border-radius: 0 0 1rem 1rem;
   margin-right: 1rem;
-  // make the list scrollable
   overflow-y: scroll;
-  // hide the scrollbar
   &::-webkit-scrollbar {
     display: none;
   }
@@ -43,21 +41,29 @@ const NftListWrapper = styled.div`
 
 const TrdingPanel = styled.div`
   display: flex;
-  flex: 1;
   flex-direction: column;
   border-radius: 1rem;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
+
+const TradingPanelWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  flex-direction: row;
 `
 
 const TradeButton = styled(Button)`
   background: ${Colors.buttonBackground};
   width: 10rem;
   height: 3rem;
-  margin: 0.5rem 0 0.5rem 0;
   transition: 0.1s ease-in;
   color: #fff;
   font-size: 14px;
   font-weight: 600;
-  margin: 2rem 0 0 0;
   &:hover {
     background: ${Colors.buttonBackground};
   }
@@ -96,7 +102,7 @@ const SelectorWrapper = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  margin: 0.5rem 0 0.5rem 0;
+  margin: 0 0 0.5rem 0;
 `
 
 const GoBackButton = styled(Button)`
@@ -113,19 +119,35 @@ const GoBackButton = styled(Button)`
   }
 `
 
-const customStyles = {
-  control: (base: any) => ({
-    ...base,
-    width: 500,
-    height: "3rem",
-    color: "#0a0909",
-    margin: "1rem 0 0 0",
-    borderRadius: "1rem",
-    border: "1px solid #f71dfb84",
-    background: 'white',
-    fontSize: "1rem",
-  }),
-}
+const MyNftList = styled.div`
+  border-radius: 1rem;
+  padding: 1rem;
+
+  margin: 0 0 2rem 0;
+  background: ${Colors.cardBackground};
+`
+
+const TradeInfoWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`
+
+const ApproveWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 1rem 0 0 0;
+`
+
+const ApproveCheckbox = styled.input`
+  height: 1.5rem;
+  width: 1.5rem;
+  margin: 0 1rem 0 0;
+`
+
+
 
 const settings = {
   apiKey: config.ALCHEMY_API_KEY,
@@ -145,7 +167,8 @@ export const TradingPanel = () => {
   const senderAddress = useSelector((state: any) => state.user.user.walletAddress)
   const isLoggedin = useSelector((state: any) => state.user.isLoggedin)
   const isSubmitted = useSelector((state: any) => state.trade.isSubmitted)
-  const receiver = useSelector((state: any) => state.trade.receiverAddress)
+  const receiverWalletAddress = useSelector((state: any) => state.trade.walletAddress)
+  const receiverUsername = useSelector((state: any) => state.trade.username)
   const [tokenAddress, setTokenAddress] = useState('')
   const [tokenId, setTokenId] = useState('')
   const [type, setType] = useState('')
@@ -153,8 +176,6 @@ export const TradingPanel = () => {
   const [selected, setSelected] = useState(NftListSwitch.MY_NFTS)
 
   const [listOfNfts, setListOfNfts] = useState<OwnedNft[]>([])
-  const receiverAddress = receiver
-  console.log(receiverAddress)
 
   const handleMyNftsClicked = useCallback(async () => {
     setSelected(NftListSwitch.MY_NFTS)
@@ -168,12 +189,12 @@ export const TradingPanel = () => {
 
   const handleTheirNftsClicked = useCallback(async () => {
     setSelected(NftListSwitch.THEIR_NFTS)
-    const theirNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(receiver) : { ownedNfts: [] }
+    const theirNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(receiverWalletAddress) : { ownedNfts: [] }
     setListOfNfts(theirNfts.ownedNfts)
-  }, [isLoggedin, receiver])
+  }, [isLoggedin, receiverWalletAddress])
 
   const handleBack = () => {
-    dispatch(removeReceiverAddress())
+    dispatch(removeReceiverInfo())
     setSelected(NftListSwitch.MY_NFTS)
   }
 
@@ -192,33 +213,32 @@ export const TradingPanel = () => {
                 <SelectButton onClick={handleTheirNftsClicked}>Their NFTs</SelectButton>
               </SelectorWrapper>
               {selected === NftListSwitch.MY_NFTS ? (
-                <NftList interactive />
+                <NftList size='medium' interactive />
               ) : (
-                <NftList nftList={listOfNfts} interactive />
+                <NftList nftList={listOfNfts} size='medium' interactive />
               )
               }
             </NftListWrapper>
-            <MyNftList>
-              <NftList nftList={listOfNfts} interactive />
-            </MyNftList>
-            <TrdingPanel>
-              <SmallText>Token Address</SmallText>
-              <input
-                value={tokenAddress}
-                onChange={(e) => setTokenAddress(e.target.value)}
-              />
-              <SmallText>Token Id</SmallText>
-              <input
-                value={tokenId}
-                onChange={(e) => setTokenId(e.target.value)}
-              />
-              <SmallText>Type</SmallText>
-              <input
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-              />
-              <TradeButton>Trade</TradeButton>
-            </TrdingPanel>
+
+            <TradingPanelWrapper>
+              <TrdingPanel>
+                <Text>Your NFTs</Text>
+                <MyNftList>
+                  <NftList showShadow={false} nftList={listOfNfts} interactive size='small' />
+                  <ApproveWrapper>
+                    <ApproveCheckbox type='checkbox' />
+                    <MediumText>Approve trade</MediumText>
+                  </ApproveWrapper>
+                </MyNftList>
+                <Text>{receiverUsername}'s NFTs</Text>
+                <MyNftList>
+                  <NftList showShadow={false} nftList={listOfNfts} interactive size='small' />
+                </MyNftList>
+                <TradeInfoWrapper>
+                  <TradeButton>Trade</TradeButton>
+                </TradeInfoWrapper>
+              </TrdingPanel>
+            </TradingPanelWrapper>
           </>
         ) : (
           <ProfileSearch />

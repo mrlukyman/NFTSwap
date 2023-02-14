@@ -37,11 +37,8 @@ const Wrapper = styled.button`
 type ProfileSearchProps = {
   username: string
   walletAddress: `0x${string}` | undefined
-  handleAddressSubmit: (e: React.MouseEvent<HTMLElement>, walletAddress: `0x${string}` | undefined) => void
+  handleAddressSubmit: (e: React.MouseEvent<HTMLElement>, walletAddress: `0x${string}` | undefined, username: string) => void
 }
-
-
-
 
 export const ProfileSearchCard = ({ username, walletAddress, handleAddressSubmit }: ProfileSearchProps) => {
   const { data, isError, isLoading } = useEnsAvatar({
@@ -49,7 +46,7 @@ export const ProfileSearchCard = ({ username, walletAddress, handleAddressSubmit
     address: walletAddress,
   })
   return (
-    <Wrapper onClick={(e: React.MouseEvent<HTMLElement>) => handleAddressSubmit(e, walletAddress)}>
+    <Wrapper onClick={(e: React.MouseEvent<HTMLElement>) => handleAddressSubmit(e, walletAddress, username)}>
       <img src='https://picsum.photos/50' alt={username} />
       <p>@{username}</p>
     </Wrapper>
