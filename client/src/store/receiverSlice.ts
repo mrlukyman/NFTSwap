@@ -1,12 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  receiverAddress: null,
+  walletAddress: null,
+  username: null,
   isSubmitted: false,
-  receiverListOfTokens: [
+  listOfTokens: [
     {
-    tokenAddress: null,
-    tokenAmount: null,
+
     }
   ],
 }
@@ -15,27 +15,34 @@ const receiverSlice = createSlice({
   name: 'receiver',
   initialState,
   reducers: {
-    setReceiverAddress: (state, action) => {
+    setReceiverInfo: (state, action) => {
+      state.walletAddress = action.payload.walletAddress
+      state.username = action.payload.username
       state.isSubmitted = true
-      state.receiverAddress = action.payload
     },
-    removeReceiverAddress: (state) => {
+    removeReceiverInfo: (state) => {
+      state.walletAddress = null
+      state.username = null
       state.isSubmitted = false
-      state.receiverAddress = null
     },
     addTokensToReceiver: (state, action) => {
-      state.receiverListOfTokens = [...state.receiverListOfTokens, action.payload]
+      state.listOfTokens = [...state.listOfTokens, action.payload]
     },
-    removeTokensFromReceiver: (state, action) => {
-      state.receiverListOfTokens = state.receiverListOfTokens.filter(
-        (token) => token.tokenAddress !== action.payload
-      )
-    },
+    // removeTokensFromReceiver: (state, action) => {
+    //   state.listOfTokens = state.listOfTokens.filter(
+    //     (token) => token.tokenId !== action.payload
+    //   )
+    // },
     removeAllTokensFromReceiver: (state) => {
-      state.receiverListOfTokens = []
+      state.listOfTokens = []
     }
   },
 })
 
 export const receiverSliceReducer = receiverSlice.reducer
-export const { setReceiverAddress, removeReceiverAddress } = receiverSlice.actions
+export const { 
+  setReceiverInfo, 
+  removeReceiverInfo, 
+  addTokensToReceiver, 
+  removeAllTokensFromReceiver, 
+   } = receiverSlice.actions

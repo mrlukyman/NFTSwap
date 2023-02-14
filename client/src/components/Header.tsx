@@ -4,7 +4,7 @@ import { topbar } from "react-router-loading"
 import { Nav } from './Nav'
 import { Colors } from '../styles/Colors'
 import { Link } from 'react-router-dom'
-import { userActions } from '../store/userSlice'
+import { login, logout } from '../store/userSlice'
 import { useDispatch } from 'react-redux'
 import { gql } from '@apollo/client'
 import { ConnectKitButton } from 'connectkit'
@@ -69,7 +69,7 @@ export const Header = () => {
         if (data) {
           console.log('data', data)
           if (data.getUser === null) {
-            dispatch(userActions.login({
+            dispatch(login({
               email: null,
               username: null,
               name: null,
@@ -78,7 +78,7 @@ export const Header = () => {
             console.log('redirecting')
             navigate("/register")
           } else {
-            dispatch(userActions.login({
+            dispatch(login({
               email: data.getUser.email,
               username: data.getUser.username,
               name: data.getUser.name,
@@ -93,7 +93,7 @@ export const Header = () => {
     if (isConnected) {
       handleConnect(address)
     } else {
-      dispatch(userActions.logout())
+      dispatch(logout())
     }
   }, [address, dispatch, handleConnect, isConnected])
   return (

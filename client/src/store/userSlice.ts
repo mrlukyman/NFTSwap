@@ -8,6 +8,10 @@ const initialState = {
     name: null,
     walletAddress: null,
   },
+  listOfTokens: [
+    {
+    }
+  ],
 }
 
 const userSlice = createSlice({
@@ -21,9 +25,20 @@ const userSlice = createSlice({
     logout: (state) => {
       state.isLoggedin = false
       state.user = initialState.user
+    },
+    addTokensToSender: (state, action) => {
+      state.listOfTokens = [...state.listOfTokens, action.payload]
+    },
+    // removeTokensFromSender: (state, action) => {
+    //   state.listOfTokens = state.listOfTokens.filter(
+    //     (token) => token.tokenAddress !== action.payload
+    //   )
+    // },
+    removeAllTokensFromSender: (state) => {
+      state.listOfTokens = []
     }
   }
 })
 
 export const userSliceReducer = userSlice.reducer
-export const userActions = userSlice.actions
+export const {login, logout, addTokensToSender, removeAllTokensFromSender} = userSlice.actions
