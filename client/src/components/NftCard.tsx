@@ -10,8 +10,7 @@ const Card = styled.div`
   border-radius: 1rem;
   position: relative;
   &:hover{
-    cursor: pointer;
-    ${({ interactive }: nftListType) => interactive === true && ('transform: translateY(-0.4rem); transition: transform 0.2s ease-in-out;')}
+    ${({ interactive }: nftListType) => interactive === true && ('transform: translateY(-0.4rem); transition: transform 0.2s ease-in-out; cursor: pointer;')}
   }
 `
 
@@ -29,6 +28,7 @@ const Video = styled.video`
   object-fit: cover;
   border-radius: 1rem;
   aspect-ratio: 1/1;
+  overflow: hidden;
 `
 
 const Shadow = styled.div`
