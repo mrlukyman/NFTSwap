@@ -67,7 +67,6 @@ export const Header = () => {
     getUser({ variables: { walletAddress: newAccount } })
       .then(({ data }) => {
         if (data) {
-          console.log('data', data)
           if (data.getUser === null) {
             dispatch(login({
               email: null,
