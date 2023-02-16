@@ -56,7 +56,16 @@ const Placeholder = styled.div`
   display: flex;
   flex: 1;
   background: #ffffff18;
+  flex-direction: column;
   border-radius: 1rem;
+  aspect-ratio: 1/1;
+`
+
+const NftCardWrapper = styled.div`
+  bakcground: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
 `
 
 const settings = {
@@ -66,7 +75,7 @@ const settings = {
 
 const alchemy = new Alchemy(settings)
 
-export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow }: nftListType) => {
+export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow, handleNftClicked }: nftListType) => {
   const walletAddress = useSelector((state: any) => state.user.user.walletAddress)
   const isLoggedin = useSelector((state: any) => state.user.isLoggedin)
 
@@ -80,6 +89,7 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
     nftList
       ?
       setListOfNfts(nftList.filter((nft: OwnedNft) => nft.tokenId !== "0"))
+
       :
       setListOfNfts(nfts.ownedNfts.filter((nft: OwnedNft) => nft.tokenId !== "0"));
     setIsLoading(false);
@@ -91,8 +101,6 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
     setIsLoading(false);
     loadingContext.done();
   }, [getNfts, loadingContext])
-
-  console.log(listOfNfts)
   return (
     <>
       <Wrapper size={size || 'medium'} elementsPerRow={elementsPerRow || 'auto-fill'}>
@@ -100,7 +108,11 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
           listOfNfts?.map((nft: OwnedNft) => (
             nft.rawMetadata && nft.tokenId !== "0"
               ? (
-                <>
+                <NftCardWrapper onClick={
+                  () => {
+                    handleNftClicked && interactive ? handleNftClicked(nft) : void (0)
+                  }
+                }>
                   <NftCard
                     showShadow={showShadow}
                     interactive={interactive}
@@ -109,23 +121,26 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
                     title={size === 'small' ? undefined : nft.title}
                     priceInEth={size === 'small' ? undefined : '0.1'}
                   />
-                </>
+                </NftCardWrapper>
               )
               : null
           ))
         }
         {
-          showShadow === false
+          showShadow === false && interactive && listOfNfts.length < 10
             ? Array.from(Array(10 - listOfNfts.length).keys()).map((i) => (
               <Placeholder key={i} />
             ))
-            : listOfNfts.length < 10 && listOfNfts.length > 0 && interactive
+            : !showShadow && interactive && listOfNfts.length < 9
               ? Array.from(Array(9 - listOfNfts.length).keys()).map((i) => (
                 <Placeholder key={i} />
               ))
-              : null
+              : showShadow === false && interactive && listOfNfts.length > 10 && listOfNfts.length % 5 !== 0
+                ? Array.from(Array(5 - (listOfNfts.length % 5)).keys()).map((i) => (
+                  <Placeholder key={i} />
+                ))
+                : null
         }
-
       </Wrapper>
     </>
   )
