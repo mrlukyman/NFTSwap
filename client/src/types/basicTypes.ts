@@ -6,6 +6,7 @@ export type nftListType = {
   size?: string
   showShadow?: boolean
   elementsPerRow?: number | string
+  handleNftClicked?: (nft: OwnedNft) => void
 }
 
 export type receiverType = {

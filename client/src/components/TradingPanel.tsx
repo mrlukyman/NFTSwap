@@ -122,7 +122,7 @@ const GoBackButton = styled(Button)`
 const MyNftList = styled.div`
   border-radius: 1rem;
   padding: 1rem;
-
+  width: 50rem; // TODO: make this responsive
   margin: 0 0 2rem 0;
   background: ${Colors.cardBackground};
 `
@@ -147,8 +147,6 @@ const ApproveCheckbox = styled.input`
   margin: 0 1rem 0 0;
 `
 
-
-
 const settings = {
   apiKey: config.ALCHEMY_API_KEY,
   network: Network.MATIC_MAINNET,
@@ -169,21 +167,18 @@ export const TradingPanel = () => {
   const isSubmitted = useSelector((state: any) => state.trade.isSubmitted)
   const receiverWalletAddress = useSelector((state: any) => state.trade.walletAddress)
   const receiverUsername = useSelector((state: any) => state.trade.username)
-  const [tokenAddress, setTokenAddress] = useState('')
-  const [tokenId, setTokenId] = useState('')
-  const [type, setType] = useState('')
+
   // state for controlling which button is selected
   const [selected, setSelected] = useState(NftListSwitch.MY_NFTS)
 
   const [listOfNfts, setListOfNfts] = useState<OwnedNft[]>([])
+  const [listOfSenderNfts, setListOfSenderNfts] = useState<OwnedNft[]>([])
+  const [listOfReceiverNfts, setListReceiverOfNfts] = useState<OwnedNft[]>([])
 
   const handleMyNftsClicked = useCallback(async () => {
     setSelected(NftListSwitch.MY_NFTS)
     const myNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(senderAddress) : { ownedNfts: [] }
     setListOfNfts(myNfts.ownedNfts)
-    setTokenAddress(myNfts.ownedNfts[0].contract.address)
-    setTokenId(myNfts.ownedNfts[0].tokenId)
-    setType(myNfts.ownedNfts[0].tokenType)
     // console.log(myNfts.ownedNfts)
   }, [isLoggedin, senderAddress])
 
@@ -196,6 +191,22 @@ export const TradingPanel = () => {
   const handleBack = () => {
     dispatch(removeReceiverInfo())
     setSelected(NftListSwitch.MY_NFTS)
+    setListOfSenderNfts([])
+    setListReceiverOfNfts([])
+  }
+
+  const handleNftClicked = (nft: OwnedNft) => {
+    if (selected === NftListSwitch.MY_NFTS) {
+      if (listOfSenderNfts.some((nftInList) => nftInList.contract.address === nft.contract.address)) {
+        return
+      }
+      setListOfSenderNfts([...listOfSenderNfts, nft])
+    } else {
+      if (listOfReceiverNfts.some((nftInList) => nftInList.contract.address === nft.contract.address)) {
+        return
+      }
+      setListReceiverOfNfts([...listOfReceiverNfts, nft])
+    }
   }
 
   useEffect(() => {
@@ -213,9 +224,9 @@ export const TradingPanel = () => {
                 <SelectButton onClick={handleTheirNftsClicked}>Their NFTs</SelectButton>
               </SelectorWrapper>
               {selected === NftListSwitch.MY_NFTS ? (
-                <NftList size='medium' interactive />
+                <NftList handleNftClicked={handleNftClicked} size='medium' interactive />
               ) : (
-                <NftList nftList={listOfNfts} size='medium' interactive />
+                <NftList handleNftClicked={handleNftClicked} nftList={listOfNfts} size='medium' interactive />
               )
               }
             </NftListWrapper>
@@ -224,7 +235,7 @@ export const TradingPanel = () => {
               <TrdingPanel>
                 <Text>Your NFTs</Text>
                 <MyNftList>
-                  <NftList showShadow={false} nftList={listOfNfts} interactive size='small' />
+                  <NftList handleNftClicked={handleNftClicked} showShadow={false} nftList={listOfSenderNfts} interactive size='small' />
                   <ApproveWrapper>
                     <ApproveCheckbox type='checkbox' />
                     <MediumText>Approve trade</MediumText>
@@ -232,7 +243,7 @@ export const TradingPanel = () => {
                 </MyNftList>
                 <Text>{receiverUsername}'s NFTs</Text>
                 <MyNftList>
-                  <NftList showShadow={false} nftList={listOfNfts} interactive size='small' />
+                  <NftList handleNftClicked={handleNftClicked} showShadow={false} nftList={listOfReceiverNfts} interactive size='small' />
                 </MyNftList>
                 <TradeInfoWrapper>
                   <TradeButton>Trade</TradeButton>
