@@ -149,7 +149,7 @@ const ApproveCheckbox = styled.input`
 
 const settings = {
   apiKey: config.ALCHEMY_API_KEY,
-  network: Network.MATIC_MAINNET,
+  network: Network.ETH_MAINNET,
 }
 
 enum NftListSwitch {
@@ -184,9 +184,10 @@ export const TradingPanel = () => {
 
   const handleTheirNftsClicked = useCallback(async () => {
     setSelected(NftListSwitch.THEIR_NFTS)
-    const theirNfts = isLoggedin ? await alchemy.nft.getNftsForOwner(receiverWalletAddress) : { ownedNfts: [] }
+    const theirNfts = isLoggedin ? await alchemy.nft.getNftsForOwner('effektsvk.eth') : { ownedNfts: [] }
+    console.log(theirNfts.ownedNfts)
     setListOfNfts(theirNfts.ownedNfts)
-  }, [isLoggedin, receiverWalletAddress])
+  }, [isLoggedin])
 
   const handleBack = () => {
     dispatch(removeReceiverInfo())
@@ -197,12 +198,12 @@ export const TradingPanel = () => {
 
   const handleNftClicked = (nft: OwnedNft) => {
     if (selected === NftListSwitch.MY_NFTS) {
-      if (listOfSenderNfts.some((nftInList) => nftInList.contract.address === nft.contract.address)) {
+      if (listOfSenderNfts.some((nftInList) => nftInList.tokenId === nft.tokenId)) {
         return
       }
       setListOfSenderNfts([...listOfSenderNfts, nft])
     } else {
-      if (listOfReceiverNfts.some((nftInList) => nftInList.contract.address === nft.contract.address)) {
+      if (listOfReceiverNfts.some((nftInList) => nftInList.tokenId === nft.tokenId)) {
         return
       }
       setListReceiverOfNfts([...listOfReceiverNfts, nft])
