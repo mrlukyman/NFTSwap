@@ -56,7 +56,6 @@ export const ProfileSearch = () => {
 
   const getAddresses = useCallback(async () => {
     getUsers().then((res) => {
-      console.log(res.data.getUsers)
       if (res.data.getUsers) {
         setUsers(res.data.getUsers)
       }
@@ -93,7 +92,6 @@ export const ProfileSearch = () => {
 
   const handleAddressSubmit = (e: any, walletAddress: string, username: string) => {
     e.preventDefault()
-    console.log(walletAddress)
     if (walletAddress) {
       dispatch(setReceiverInfo({ walletAddress: walletAddress, username: username }))
     } else {
