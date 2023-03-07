@@ -16,7 +16,31 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   role          Role     @default(USER)
+  Nft           Nft[]
+  // Trade         Trade[]
 }
+
+model Nft {
+  id           Int    @id @default(autoincrement())
+  title        String
+  tokenAddress String
+  tokenImage   String
+  tokenId      String
+  type         String
+  owner        User   @relation(fields: [ownerId], references: [id])
+  ownerId      Int
+}
+
+// model Trade {
+//   id            Int      @id @default(autoincrement())
+//   sender        User     @relation(fields: [buyerId], references: [id])
+//   buyerId       Int
+//   receiver      String
+//   buyerNfts     Nft[]
+//   sellerNfts    Nft[]
+//   createdAt     DateTime @default(now())
+//   updatedAt     DateTime @updatedAt
+// }
 
 enum Role {
   ADMIN
