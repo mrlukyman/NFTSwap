@@ -86,7 +86,7 @@ export const NftCard = ({ imgSrc, title, priceInEth, interactive, showShadow }: 
       }
       <BottomPartWrapper>
         <MediumText>{title}</MediumText>
-        <PriceWrapper>
+        {/* <PriceWrapper>
           {priceInEth &&
             <>
               <PriceInEth>
@@ -95,7 +95,7 @@ export const NftCard = ({ imgSrc, title, priceInEth, interactive, showShadow }: 
               <FaEthereum />
             </>
           }
-        </PriceWrapper>
+        </PriceWrapper> */}
       </BottomPartWrapper>
     </Card>
   )

@@ -74,7 +74,6 @@ export const Header = () => {
               name: null,
               walletAddress: newAccount
             }))
-            console.log('redirecting')
             navigate("/register")
           } else {
             dispatch(login({
