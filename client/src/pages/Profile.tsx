@@ -37,7 +37,7 @@ const UserDataWrapper = styled.div`
 
 export const Profile = () => {
   const username = useSelector((state: any) => state.user.user.username)
-  const isLoggedin = useSelector((state: any) => state.user.isLoggedin)
+  const isLoggedin = useSelector((state: any) => state.user.isLoggedin) //TODO: consider using isConnected from connectkit instead of isLoggedin from redux
   const address = useSelector((state: any) => state.user.user.walletAddress)
 
   return (
