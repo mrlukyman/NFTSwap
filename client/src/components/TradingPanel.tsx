@@ -1,24 +1,19 @@
 import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
-import { Alchemy, Network, OwnedNft, AlchemyProvider, AlchemyConfig } from "alchemy-sdk"
+import { Alchemy, Network, OwnedNft } from "alchemy-sdk"
 import Select from 'react-select'
 import { NftSwap } from '@traderxyz/nft-swap-sdk'
 import { NftList } from './NftList'
 import config from '../config.json'
-import { Button, MediumText, Text, Title } from '../styles/GlobalStyles'
+import { Button, MediumText, Text } from '../styles/GlobalStyles'
 import { SmallText } from '../styles/GlobalStyles'
 import { Colors } from '../styles/Colors'
 import { ProfileSearch } from './ProfileSearch'
 import { receiverType } from '../types/basicTypes'
 import { useDispatch } from 'react-redux'
 import { removeReceiverInfo } from '../store/receiverSlice'
-import { useSigner } from 'wagmi'
-import signer, { ethers } from 'ethers'
-import ts from 'typescript'
-
-// From your app, provide NftSwap the web3 provider, signer for the user's wallet, and the chain id.
-
+import { ethers } from 'ethers'
 
 const Wrapper = styled.div`
   display: flex;
