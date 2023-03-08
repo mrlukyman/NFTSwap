@@ -63,7 +63,6 @@ export const RegistrationForm = () => {
   const address = useSelector((state: any) => state.user.user.walletAddress)
   const [walletAddress, setWalletAddress] = useState(address || '')
   const navigate = useNavigate()
-  const { getUser } = useGetUser()
 
 
   const [createUser] = useMutation(CREATE_USER)
