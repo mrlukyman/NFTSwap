@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { topbar } from "react-router-loading"
 import { Nav } from './Nav'
@@ -9,9 +9,19 @@ import { useDispatch } from 'react-redux'
 import { gql } from '@apollo/client'
 import { ConnectKitButton } from 'connectkit'
 import { useAccount } from 'wagmi'
+import { ProfileSearch } from "./ProfileSearch";
 import logo from '../assets/logo.png'
 import { useNavigate } from "react-router-dom";
 import { useGetUser } from '../api/hooks/useGetUser'
+import { useGetUserIncommingOffers } from '../api/hooks/useGetUserIncommingOffers'
+import { CgArrowsExchange, CgMathPercent, CgProfile } from 'react-icons/cg'
+import { BiWallet } from "react-icons/bi"
+
+enum OfferStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  DECLINED = 'DECLINED',
+}
 
 topbar.config({
   autoRun: true,
@@ -46,8 +56,7 @@ const LogoLink = styled(Link)`
 `
 
 const Logo = styled.img`
-  width: 3rem;
-  height: 3rem;
+  height: 2rem;
 `
 
 const UserWrapper = styled.div`
@@ -57,17 +66,65 @@ const UserWrapper = styled.div`
   align-items: center;
 `
 
+const TradeIcon = styled(CgArrowsExchange)`
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #fff;
+  margin-right: 1rem;
+`
+
+const WalletIcon = styled(BiWallet)`
+  width: 2rem;
+  height: 2rem;
+  color: #fff;
+  margin-right: 1rem;
+`
+
+const ProfileIcon = styled(CgProfile)`
+  width: 2rem;
+  height: 2rem;
+  color: #fff;
+  margin-right: 1rem;
+`
+
+const TradeIconContainer = styled.div`
+  position: relative;
+`
+
+const TradeIconBadge = styled.div`
+  width: 0.7rem;
+  height: 0.7rem;
+  background: #02ec16;
+  border-radius: 50%;
+
+  position: absolute;
+  top: 1px;
+  right: 0.86rem;
+`
+
 export const Header = () => {
   const dispatch = useDispatch()
-  const { getUser } = useGetUser()
   const { address, isConnected } = useAccount()
+  const { getUser } = useGetUser(address)
   const navigate = useNavigate()
+  const [incommingOffers, setIncommingOffers] = useState<any[]>([])
 
-  const handleConnect = useCallback(async (newAccount: string | undefined) => {
+  const { data, loading, error } = useGetUserIncommingOffers(address as `0x${string}`)
+
+
+  const handleConnect = useCallback((newAccount: `0x${string}` | undefined) => {
     getUser({ variables: { walletAddress: newAccount } })
       .then(({ data }) => {
         if (data) {
-          if (data.getUser === null) {
+          if (data.getUser !== null) {
+            dispatch(login({
+              email: data.getUser.email,
+              username: data.getUser.username,
+              name: data.getUser.name,
+              walletAddress: newAccount
+            }))
+          } else {
+            console.log("no user found, redirecting to register")
             dispatch(login({
               email: null,
               username: null,
@@ -75,32 +132,50 @@ export const Header = () => {
               walletAddress: newAccount
             }))
             navigate("/register")
-          } else {
-            dispatch(login({
-              email: data.getUser.email,
-              username: data.getUser.username,
-              name: data.getUser.name,
-              walletAddress: newAccount
-            }))
           }
+        } else {
+          console.log("no user found, redirecting to register")
+          dispatch(login({
+            email: null,
+            username: null,
+            name: null,
+            walletAddress: newAccount
+          }))
+          navigate("/register")
         }
       })
   }, [dispatch, getUser, navigate])
-
   useEffect(() => {
     if (isConnected) {
       handleConnect(address)
+      setIncommingOffers(data?.getUserIncommingOffers?.filter((offer: any) => offer.status === OfferStatus.PENDING))
     } else {
       dispatch(logout())
     }
-  }, [address, dispatch, handleConnect, isConnected])
+  }, [address, data, dispatch, handleConnect, isConnected])
   return (
     <Wrapper>
       <LogoLink to="/">
         <Logo alt="logo" src={logo}></Logo>
       </LogoLink>
-      <Nav />
+      {/* <Nav /> */}
       <UserWrapper>
+        {isConnected
+          ?
+          <>
+            <TradeIconContainer>
+              <Link to="/trade">
+                <TradeIcon />
+                {incommingOffers?.length > 0 ? <TradeIconBadge /> : null}
+              </Link>
+            </TradeIconContainer>
+            <Link to="/profile">
+              <ProfileIcon />
+            </Link>
+          </>
+          : null
+
+        }
         <ConnectKitButton />
       </UserWrapper>
     </Wrapper>
