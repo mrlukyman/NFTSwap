@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { NftCard } from './NftCard'
-import { Alchemy, Network, OwnedNft } from "alchemy-sdk"
+import { Alchemy, Network, OwnedNft, NftFilters } from "alchemy-sdk"
 import styled from 'styled-components'
 import { useLoadingContext } from 'react-router-loading'
 import config from '../config.json'
@@ -85,11 +85,13 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
   const [isLoading, setIsLoading] = useState(true);
 
   const getNfts = useCallback(async () => {
-    const nfts = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress) : { ownedNfts: [] }
+    const nfts = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress, {
+      omitMetadata: false,
+      excludeFilters: [NftFilters.SPAM, NftFilters.AIRDROPS],
+    }) : { ownedNfts: [] }
     nftList
       ?
       setListOfNfts(nftList.filter((nft: OwnedNft) => nft.tokenId !== "0"))
-
       :
       setListOfNfts(nfts.ownedNfts.filter((nft: OwnedNft) => nft.tokenId !== "0"));
     setIsLoading(false);
@@ -105,7 +107,7 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
     <>
       <Wrapper size={size || 'medium'} elementsPerRow={elementsPerRow || 'auto-fill'}>
         {isLoading ? <p>loading</p> :
-          listOfNfts?.map((nft: OwnedNft) => (
+          listOfNfts?.map((nft: any) => (
             nft.rawMetadata && nft.tokenId !== "0"
               ? (
                 <NftCardWrapper onClick={
