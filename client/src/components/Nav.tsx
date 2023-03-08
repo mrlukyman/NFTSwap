@@ -39,7 +39,6 @@ export const Nav = () => {
         <Wrapper>
           <NavItem to="/">Home</NavItem>
           <NavItem to="/trade">Trade</NavItem>
-          <NavItem to="/profile">Profile</NavItem>
         </Wrapper>
       ) : (
         <Wrapper>
@@ -49,7 +48,6 @@ export const Nav = () => {
                 <>
                   <NavItem to='/'>Home</NavItem>
                   <NavItem onClick={show} to='/'>Trade</NavItem>
-                  <NavItem onClick={show} to='/'>Profile</NavItem>
                 </>
               )
             }}
