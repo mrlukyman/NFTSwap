@@ -8,16 +8,18 @@ datasource db {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
-  name          String?
-  username      String   @unique
-  walletAddress String?  @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  role          Role     @default(USER)
-  Nft           Nft[]
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
+  name            String?
+  username        String   @unique
+  walletAddress   String?  @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  role            Role     @default(USER)
+  Nft             Nft[]
   // Trade         Trade[]
+  incommingOffers Offer[]  @relation("taker")
+  outgoingOffers  Offer[]  @relation("maker")
 }
 
 model Nft {
@@ -31,18 +33,27 @@ model Nft {
   ownerId      Int
 }
 
-// model Trade {
-//   id            Int      @id @default(autoincrement())
-//   sender        User     @relation(fields: [buyerId], references: [id])
-//   buyerId       Int
-//   receiver      String
-//   buyerNfts     Nft[]
-//   sellerNfts    Nft[]
-//   createdAt     DateTime @default(now())
-//   updatedAt     DateTime @updatedAt
-// }
+model Offer {
+  id                 Int         @id @default(autoincrement())
+  makerData          Json
+  makerNfts          Json[]
+  takerNfts          Json[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  maker              User        @relation("maker", fields: [makerWalletAddress], references: [walletAddress])
+  makerWalletAddress String
+  taker              User        @relation("taker", fields: [takerWalletAddress], references: [walletAddress])
+  takerWalletAddress String
+  status             OfferStatus @default(PENDING)
+}
 
 enum Role {
   ADMIN
   USER
+}
+
+enum OfferStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }
