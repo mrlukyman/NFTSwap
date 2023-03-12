@@ -253,7 +253,7 @@ export const TradingPanel = () => {
   }
 
   const handleSwap = async () => {
-    const transaction = swap(defaultWalletAddress, listOfSenderNfts, listOfReceiverNfts, receiverWalletAddress)
+    swap(defaultWalletAddress, listOfSenderNfts, listOfReceiverNfts, receiverWalletAddress)
       .then((res) => {
         createOffer({
           variables: {
@@ -265,8 +265,7 @@ export const TradingPanel = () => {
           },
         })
         alert(`🎉 🥳 Order filled`)
-      }
-      )
+      })
       .catch((err) => {
         console.log(err)
       })

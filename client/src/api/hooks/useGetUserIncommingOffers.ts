@@ -8,9 +8,6 @@ const GET_USER_INCOMMING_OFFERS = gql`
       makerNfts
       takerNfts
       status
-      maker {
-        username
-      }
       makerWalletAddress
     }
   }
