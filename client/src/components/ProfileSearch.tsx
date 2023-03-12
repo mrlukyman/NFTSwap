@@ -2,19 +2,17 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Input, SmallText, Text } from '../styles/GlobalStyles'
 import { useDebounce } from 'use-debounce'
 import Fuse from 'fuse.js'
-import { useQuery, gql, useLazyQuery } from '@apollo/client'
-import { receiverType } from '../types/basicTypes'
-import { setReceiverInfo, removeReceiverInfo } from '../store/receiverSlice'
+import { gql, useLazyQuery, useMutation } from '@apollo/client'
+import { setReceiverInfo } from '../store/receiverSlice'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { Colors } from '../styles/Colors'
-import { userSearchType } from '../types/basicTypes'
 import { ProfileSearchCard } from './ProfileSearchCard'
 import { useGetUserIncommingOffers } from '../api/hooks/useGetUserIncommingOffers'
 import { NftList } from './NftList'
 import { useGetUser } from '../api/hooks/useGetUser'
 import { part2 } from '../api/swap'
-import { useDeclineOffer } from '../api/hooks/useDeclineOffer'
+import { Title } from '../styles/GlobalStyles'
 
 const GET_USERS = gql`
   query Query {
@@ -25,10 +23,27 @@ const GET_USERS = gql`
   }
 `
 
+const DECLINE_OFFER = gql`
+  mutation Mutation($declineOfferId: Int!) {
+    declineOffer(id: $declineOfferId) {
+      id
+    }
+  }
+`
+
+const ACCEPT_OFFER = gql`
+  mutation AcceptOffer($acceptOfferId: Int!) {
+    acceptOffer(id: $acceptOfferId) {
+      id
+    }
+  }
+`
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  align-items: center;
+  flex: 1;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     display: none;
@@ -59,6 +74,10 @@ const TradeWrapper = styled.div`
   align-items: center;
   justify-content: center;
   margin: 2rem 0 0 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: ${Colors.cardBackground};
+  position: relative;
 `
 
 const MyNftList = styled.div`
@@ -77,16 +96,61 @@ const TradeButton = styled(Button)`
   color: #fff;
   font-size: 14px;
   font-weight: 600;
+  margin: 0 0 0 2rem;
   &:hover {
     background: ${Colors.buttonBackground};
+  }
+  &:first-child {
+    margin-left: 0;
+    background: transparent;
+    border: none;
+    width: max-content;
+    &:hover {
+      box-shadow: none;
+    }
   }
 `
 
 const TradeButtonWrapper = styled.div`
   display: flex;
-  flex-direction: row;
+  width: 100%;
+  justify-content: flex-end;
+`
+
+const Overlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  border-radius: 1rem;
+`
+
+const TradeInfo = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  padding: 0.6rem 0;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  z-index: 100;
+  color: #fff;
+  text-align: center;
+`
+
+const TitleWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0 0 1rem 0;
 `
 
 export const ProfileSearch = () => {
@@ -97,12 +161,15 @@ export const ProfileSearch = () => {
   const [users, setUsers] = useState<string[]>([])
   const [searchResults, setSearchResults] = useState<string[]>([])
   const [makerUsername, setMakerUsername] = useState<string>('')
-  const [tradeId, setTradeId] = useState<number>()
+  const [incommingOffers, setIncommingOffers] = useState<any>([])
+  const [loading, setLoading] = useState<boolean>(false)
+
 
   const [getUsers] = useLazyQuery(GET_USERS)
   const getUserIncommingOffers = useGetUserIncommingOffers(address)
-  const { getUser } = useGetUser(getUserIncommingOffers?.data.getUserIncommingOffers[0].makerWalletAddress)
-  const { declineOffer } = useDeclineOffer(tradeId)
+  const { getUser } = useGetUser(getUserIncommingOffers?.data?.getUserIncommingOffers[0]?.makerWalletAddress) //TODO: need to store multiple usernames
+  const [declineOffer] = useMutation(DECLINE_OFFER)
+  const [acceptOffer] = useMutation(ACCEPT_OFFER)
 
   const getMakerUsername = useCallback(async () => {
     getUser()
@@ -142,20 +209,36 @@ export const ProfileSearch = () => {
     [users]
   )
 
-  const handleTradeAccept = async (makerData: any) => {
-    const tradeHash = part2(makerData).then((res) => {
-      tradeHash && alert(`🎉 🥳 Order filled. TxHash: ${tradeHash}`)
-      //TODO: add accept offer mutation
-    })
+  const handleTradeAccept = async (makerData: any, id: number) => {
+    setLoading(true)
+    const tradeHash = part2(makerData)
+      .then((res) => {
+        acceptOffer({
+          variables: {
+            acceptOfferId: id
+          }
+        })
+        setLoading(false)
+        alert('Trade successful!')
+      })
       .catch((err) => {
         console.log(err)
       })
   }
 
-  const handleTradeDecline = (id: any) => {
-    setTradeId(id) //TODO: FIX THIS
-    declineOffer()
-    alert('Offer declined')
+  const handleTradeDecline = (declineOfferId: number) => {
+    // setIncommingOffers(incommingOffers.filter((offer: any) => parseInt(offer.id) !== declineOfferId))
+    console.log(incommingOffers)
+    declineOffer({
+      variables: {
+        declineOfferId
+      }
+    })
+      .then((res) => {
+        console.log(res)
+      }).catch((err) => {
+        console.log(err)
+      })
   }
 
   useEffect(() => {
@@ -166,7 +249,10 @@ export const ProfileSearch = () => {
   useEffect(() => {
     getAddresses()
     getMakerUsername()
-  }, [getAddresses, getMakerUsername])
+    const nextList = getUserIncommingOffers?.data.getUserIncommingOffers
+    const reversedList = [...nextList].reverse()
+    setIncommingOffers(reversedList)
+  }, [getAddresses, getMakerUsername, getUserIncommingOffers?.data.getUserIncommingOffers])
 
   const handleAddressSubmit = (e: any, walletAddress: string, username: string) => {
     e.preventDefault()
@@ -203,26 +289,39 @@ export const ProfileSearch = () => {
           })}
         </FormWrapper>
       </AddressWrapper>
-      {getUserIncommingOffers.data.getUserIncommingOffers.filter((nft: any) => nft.status === 'PENDING').map((offer: any) => {
+      {incommingOffers?.map((offer: any) => {
         return (
-          <TradeWrapper>
-            <MyNftList>
+          <>
+            <TradeWrapper>
+              {offer.status === 'ACCEPTED' || offer.status === 'REJECTED' ?
+                <>
+                  <Overlay />
+                  <TradeInfo style={offer.status === 'ACCEPTED' ? { background: 'green' } : { background: '#000' }} >
+                    {offer.status === 'ACCEPTED' ? <Text>Trade accepted</Text> : <Text>Trade rejected</Text>}
+                  </TradeInfo>
+                </>
+                : null
+              }
               <Text>{makerUsername} offered you a trade</Text>
-              <Text>Your NFTs</Text>
-              <NftList nftList={offer.takerNfts} size='small' interactive showShadow={false} />
-            </MyNftList>
-            <MyNftList>
-              <Text>{makerUsername}'s NFTs</Text>
-              <NftList nftList={offer.makerNfts} size='small' interactive showShadow={false} />
-            </MyNftList>
-            <TradeButtonWrapper>
-              <TradeButton onClick={() => handleTradeAccept(offer.makerData)}>Accept</TradeButton>
-              <TradeButton onClick={() => handleTradeDecline(offer.id)}>Decline</TradeButton>
-            </TradeButtonWrapper>
-          </TradeWrapper>
+              <MyNftList>
+                <Text>Your NFTs</Text>
+                <NftList nftList={offer.takerNfts} size='small' interactive showShadow={false} />
+              </MyNftList>
+              <MyNftList>
+                <Text>{makerUsername}'s NFTs</Text>
+                <NftList nftList={offer.makerNfts} size='small' interactive showShadow={false} />
+              </MyNftList>
+              {offer.status === 'ACCEPTED' || offer.status === 'REJECTED' ? null :
+                <TradeButtonWrapper>
+                  <TradeButton onClick={() => handleTradeDecline(parseInt(offer.id))}>Reject</TradeButton>
+                  <TradeButton onClick={() => handleTradeAccept(offer.makerData, parseInt(offer.id))}>Accept</TradeButton>
+                </TradeButtonWrapper>
+              }
+            </TradeWrapper>
+          </>
         )
       })
       }
-    </Wrapper>
+    </Wrapper >
   )
 }
