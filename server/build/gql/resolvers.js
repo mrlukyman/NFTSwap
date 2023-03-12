@@ -2,12 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
 const graphql_scalars_1 = require("graphql-scalars");
-var OfferStatus;
-(function (OfferStatus) {
-    OfferStatus["PENDING"] = "PENDING";
-    OfferStatus["ACCEPTED"] = "ACCEPTED";
-    OfferStatus["REJECTED"] = "REJECTED";
-})(OfferStatus || (OfferStatus = {}));
 exports.resolvers = {
     DateTime: graphql_scalars_1.DateTimeResolver,
     Query: {
@@ -94,13 +88,6 @@ exports.resolvers = {
                         connect: { walletAddress: args.takerWalletAddress },
                     },
                 },
-            }).then((offer) => {
-                return ctx.prisma.offer.update({
-                    where: { id: offer.id },
-                    data: {
-                        status: 'ACCEPTED',
-                    },
-                });
             });
         },
         acceptOffer: (_parent, args, ctx) => {

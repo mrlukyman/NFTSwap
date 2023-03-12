@@ -1,12 +1,6 @@
 import { DateTimeResolver } from 'graphql-scalars'
 import { Context } from '../context'
 
-enum OfferStatus {
-  PENDING = 'PENDING',
-  ACCEPTED = 'ACCEPTED',
-  REJECTED = 'REJECTED',
-}
-
 export const resolvers = {
   DateTime: DateTimeResolver,
   Query: {
