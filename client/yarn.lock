@@ -10354,6 +10354,11 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.npmjs.org/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-parallax-tilt@^1.7.115:
+  version "1.7.115"
+  resolved "https://registry.yarnpkg.com/react-parallax-tilt/-/react-parallax-tilt-1.7.115.tgz#d387009d17e85477bd8a8bcfe99bd137d00c93c9"
+  integrity sha512-xji2rG9US7MGEfA4qws025Tvf0F/oFfCmt+IT4mMN1nVIy+2Kj7adlGg/0KUxMV7ipkt2Vk1rCs+wOiKeVg6qw==
+
 react-redux@^8.0.5:
   version "8.0.5"
   resolved "https://registry.yarnpkg.com/react-redux/-/react-redux-8.0.5.tgz#e5fb8331993a019b8aaf2e167a93d10af469c7bd"

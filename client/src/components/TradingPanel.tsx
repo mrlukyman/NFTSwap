@@ -123,6 +123,10 @@ const SelectButton = styled(Button)`
   }
 `
 
+const TradeListText = styled(Text)`
+  margin: 0 0 1rem 0;
+`
+
 const SelectorWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -191,10 +195,6 @@ export const TradingPanel = () => {
   const isSubmitted = useSelector((state: any) => state.trade.isSubmitted)
   const receiverWalletAddress = useSelector((state: any) => state.trade.walletAddress)
   const receiverUsername = useSelector((state: any) => state.trade.username)
-
-  const { data, loading, error } = useQuery(GET_USER_INCOMMING_OFFERS, {
-    variables: { walletAddress: defaultWalletAddress },
-  });
 
   const [createOffer] = useMutation(CREATE_OFFER, {
     onCompleted: (data) => {
@@ -296,11 +296,11 @@ export const TradingPanel = () => {
             <TradingPanelWrapper>
               <TrdingPanel>
                 <MyNftList>
-                  <Text>Your NFTs</Text>
+                  <TradeListText>Your NFTs</TradeListText>
                   <NftList handleNftClicked={handleNftClicked} showShadow={false} nftList={listOfSenderNfts} interactive size='small' />
                 </MyNftList>
                 <MyNftList>
-                  <Text>{receiverUsername}'s NFTs</Text>
+                  <TradeListText>{receiverUsername}'s NFTs</TradeListText>
                   <NftList handleNftClicked={handleNftClicked} showShadow={false} nftList={listOfReceiverNfts} interactive size='small' />
                 </MyNftList>
                 <TradeInfoWrapper>

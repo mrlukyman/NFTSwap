@@ -176,6 +176,10 @@ const TradeHeaderWrapper = styled.div`
   margin: 0 0 1rem 0;
 `
 
+const TradeListText = styled(Text)`
+  margin: 0 0 1rem 0;
+`
+
 export const ProfileSearch = () => {
   const address = useSelector((state: any) => state.user.user.walletAddress)
   const dispatch = useDispatch()
@@ -187,7 +191,6 @@ export const ProfileSearch = () => {
   const [incommingOffers, setIncommingOffers] = useState<any>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [showSearch, setShowSearch] = useState<boolean>(false)
-
 
   const [getUsers] = useLazyQuery(GET_USERS)
   const getUserIncommingOffers = useGetUserIncommingOffers(address)
@@ -243,7 +246,7 @@ export const ProfileSearch = () => {
           }
         })
         setLoading(false)
-        alert(`🎉 🥳 Order filled. TxHash: ${tradeHash}`)
+        alert(`🎉 🥳 Order filled.TxHash: ${tradeHash}`)
       })
       .catch((err) => {
         console.log(err)
@@ -251,7 +254,6 @@ export const ProfileSearch = () => {
   }
 
   const handleTradeDecline = (declineOfferId: number) => {
-    // setIncommingOffers(incommingOffers.filter((offer: any) => parseInt(offer.id) !== declineOfferId))
     console.log(incommingOffers)
     declineOffer({
       variables: {
@@ -335,15 +337,14 @@ export const ProfileSearch = () => {
               }
               <TradeHeaderWrapper>
                 <Text>{makerUsername} offered you a trade</Text>
-                {/* format this date: 2023-03-13T22:34:12.021Z */}
-                <SmallText>{format(Date.parse(offer.createdAt), "dd.MM.yy")} at {format(Date.parse(offer.createdAt), "hh:mm aaa")}</SmallText>
+                <SmallText style={{ color: 'grey' }}>{format(Date.parse(offer.createdAt), "dd.MM.yy")} at {format(Date.parse(offer.createdAt), "h:mm aaa")}</SmallText>
               </TradeHeaderWrapper>
               <MyNftList>
-                <Text>Your NFTs</Text>
+                <TradeListText>Your NFTs</TradeListText>
                 <NftList nftList={offer.takerNfts} size='small' interactive showShadow={false} />
               </MyNftList>
               <MyNftList>
-                <Text>{makerUsername}'s NFTs</Text>
+                <TradeListText>{makerUsername}'s NFTs</TradeListText>
                 <NftList nftList={offer.makerNfts} size='small' interactive showShadow={false} />
               </MyNftList>
               {offer.status === 'ACCEPTED' || offer.status === 'REJECTED' ? null :
@@ -355,8 +356,7 @@ export const ProfileSearch = () => {
             </TradeWrapper>
           </>
         )
-      })
-      }
+      })}
     </Wrapper >
   )
 }

@@ -3,6 +3,7 @@ import { useAccount } from 'wagmi'
 import { Button, Title } from '../styles/GlobalStyles'
 import nft_trade from '../assets/trade_interface.png'
 import { Link } from 'react-router-dom'
+import Tilt from 'react-parallax-tilt';
 
 const Wrapper = styled.div`
   display: flex;
@@ -38,17 +39,17 @@ const HeroButton = styled(Button)`
 const Image = styled.img`
   width: 60%;
   height: auto;
-  transform: perspective(30rem) rotateX(5deg)translateY(-5rem);
 `
 
 
 export const TradeSection = () => {
-  const { isConnected } = useAccount()
   return (
     <Wrapper>
-      <Image alt="nfts" src={nft_trade}></Image>
+      <Title style={{ float: 'right' }}>Try our trading interface!</Title>
+      <Tilt perspective={100000}>
+        <Image alt="nfts" src={nft_trade}></Image>
+      </Tilt>
       <TextWrapper>
-        <Title style={{ float: 'right' }}>Try our trading interface!</Title>
         <Link to='/trade'>
           <HeroButton>Trade NFTs</HeroButton>
         </Link>
