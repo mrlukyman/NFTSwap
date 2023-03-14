@@ -1,8 +1,11 @@
-import React from 'react';
-import styled from 'styled-components';
-import { Button, LightText, Title } from '../styles/GlobalStyles';
-import nft_image from '../assets/hero_nfts.png';
-import milky_way from '../assets/milky_way.png';
+import React from 'react'
+import styled from 'styled-components'
+import { useAccount } from 'wagmi'
+import { ConnectKitButton } from "connectkit"
+import { Button, LightText, Text, Title } from '../styles/GlobalStyles'
+import nft_image from '../assets/hero_nfts.png'
+import milky_way from '../assets/milky_way.png'
+import { Link } from 'react-router-dom'
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,16 +58,35 @@ const AbsoluteImage = styled.img`
 `
 
 export const Hero = () => {
+  const { isConnected } = useAccount()
   return (
     <>
       <Wrapper>
         <TextWrapper>
           <Title>Trade your NFTs with other people</Title>
+          {!isConnected &&
+            <Text>Connect your wallet to start trading</Text>
+          }
           <LightText>NFTswap lets you trade your NFTs with outher people fast and semlessly</LightText>
-          <ButtonWrapper>
+          <ConnectKitButton.Custom>
+            {({ show }) => {
+              return (
+                <ButtonWrapper>
+                  {isConnected ? (
+                    <Link to='/trade'>
+                      <HeroButton >Trade</HeroButton>
+                    </Link>
+                  ) : (
+                    <HeroButton onClick={show}>ConnectWallet</HeroButton>
+                  )}
+                </ButtonWrapper>
+              )
+            }}
+          </ConnectKitButton.Custom>
+          {/* <ButtonWrapper>
             <HeroButton>Trade</HeroButton>
             <HeroButton>Offer</HeroButton>
-          </ButtonWrapper>
+          </ButtonWrapper> */}
         </TextWrapper>
         <Image alt="nfts" src={nft_image}></Image>
       </Wrapper>
