@@ -12,7 +12,7 @@ import { useGetUserIncommingOffers } from '../api/hooks/useGetUserIncommingOffer
 import { NftList } from './NftList'
 import { useGetUser } from '../api/hooks/useGetUser'
 import { part2 } from '../api/swap'
-import { Title } from '../styles/GlobalStyles'
+import { format } from 'date-fns'
 
 const GET_USERS = gql`
   query Query {
@@ -88,6 +88,20 @@ const MyNftList = styled.div`
   background: ${Colors.cardBackground};
 `
 
+const ShowTradeButton = styled(Button)`
+  background: ${Colors.buttonBackground};
+  width: 10rem;
+  height: 3rem;
+  transition: 0.1s ease-in;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 1rem;
+  &:hover {
+    background: ${Colors.buttonBackground};
+  }
+`
+
 const TradeButton = styled(Button)`
   background: ${Colors.buttonBackground};
   width: 10rem;
@@ -153,6 +167,15 @@ const TitleWrapper = styled.div`
   margin: 0 0 1rem 0;
 `
 
+const TradeHeaderWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 0 1rem 0;
+`
+
 export const ProfileSearch = () => {
   const address = useSelector((state: any) => state.user.user.walletAddress)
   const dispatch = useDispatch()
@@ -163,6 +186,7 @@ export const ProfileSearch = () => {
   const [makerUsername, setMakerUsername] = useState<string>('')
   const [incommingOffers, setIncommingOffers] = useState<any>([])
   const [loading, setLoading] = useState<boolean>(false)
+  const [showSearch, setShowSearch] = useState<boolean>(false)
 
 
   const [getUsers] = useLazyQuery(GET_USERS)
@@ -219,7 +243,7 @@ export const ProfileSearch = () => {
           }
         })
         setLoading(false)
-        alert('Trade successful!')
+        alert(`🎉 🥳 Order filled. TxHash: ${tradeHash}`)
       })
       .catch((err) => {
         console.log(err)
@@ -264,32 +288,39 @@ export const ProfileSearch = () => {
   }
   return (
     <Wrapper>
-      <AddressWrapper>
-        <Text>Transfer Address</Text>
-        <SmallText>Enter the username or the address of the user you want to trade with</SmallText>
-        <FormWrapper>
-          <Input
-            type='text'
-            placeholder='@username or 0x...'
-            value={receiver}
-            onChange={(e) => setReceiver(e.target.value)}
-          />
-          {searchResults.map((result: any) => { //TODO: this should be Fuse.FuseResult<userSearchType> (it think) but it doesn't work
-            if (result.walletAddress === address) {
-              return null
-            }
-            return (
-              <ProfileSearchCard
-                key={result.walletAddress}
-                handleAddressSubmit={(e: React.MouseEvent<HTMLElement>) =>
-                  handleAddressSubmit(e, result.walletAddress, result.username)}
-                username={result.username} walletAddress={result.walletAddress}
-              />
-            )
-          })}
-        </FormWrapper>
-      </AddressWrapper>
-      {incommingOffers?.map((offer: any) => {
+      {showSearch ? (
+        <AddressWrapper>
+          <Text>Transfer Address</Text>
+          <SmallText>Enter the username or the address of the user you want to trade with</SmallText>
+          <FormWrapper>
+            <Input
+              type='text'
+              placeholder='@username or 0x...'
+              value={receiver}
+              onChange={(e) => setReceiver(e.target.value)}
+            />
+            {searchResults.map((result: any) => { //TODO: this should be Fuse.FuseResult<userSearchType> (it think) but it doesn't work
+              if (result.walletAddress === address) {
+                return null
+              }
+              return (
+                <ProfileSearchCard
+                  key={result.walletAddress}
+                  handleAddressSubmit={(e: React.MouseEvent<HTMLElement>) =>
+                    handleAddressSubmit(e, result.walletAddress, result.username)}
+                  username={result.username} walletAddress={result.walletAddress}
+                />
+              )
+            })}
+          </FormWrapper>
+        </AddressWrapper>
+      ) : (
+        <TradeButtonWrapper>
+          <ShowTradeButton onClick={() => setShowSearch(true)}>Create trade</ShowTradeButton>
+        </TradeButtonWrapper>
+      )
+      }
+      {incommingOffers?.map((offer: any, idx: number) => {
         return (
           <>
             <TradeWrapper>
@@ -302,7 +333,11 @@ export const ProfileSearch = () => {
                 </>
                 : null
               }
-              <Text>{makerUsername} offered you a trade</Text>
+              <TradeHeaderWrapper>
+                <Text>{makerUsername} offered you a trade</Text>
+                {/* format this date: 2023-03-13T22:34:12.021Z */}
+                <SmallText>{format(Date.parse(offer.createdAt), "dd.MM.yy")} at {format(Date.parse(offer.createdAt), "hh:mm aaa")}</SmallText>
+              </TradeHeaderWrapper>
               <MyNftList>
                 <Text>Your NFTs</Text>
                 <NftList nftList={offer.takerNfts} size='small' interactive showShadow={false} />

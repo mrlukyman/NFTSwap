@@ -9,6 +9,7 @@ const GET_USER_INCOMMING_OFFERS = gql`
       takerNfts
       status
       makerWalletAddress
+      createdAt
     }
   }
 `
