@@ -33,6 +33,7 @@ export const typeDefs = gql`
     Nfts: [Nft]
     incommingOffers: [Offer]
     outgoingOffers: [Offer]
+    createdAt: DateTime
   }
   type Nft {
     id: ID
@@ -54,6 +55,7 @@ export const typeDefs = gql`
     taker: User
     takerWalletAddress: String
     status: OfferStatus
+    createdAt: DateTime
   }
 
   enum Role {

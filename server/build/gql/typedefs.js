@@ -35,6 +35,7 @@ exports.typeDefs = (0, apollo_server_1.gql) `
     Nfts: [Nft]
     incommingOffers: [Offer]
     outgoingOffers: [Offer]
+    createdAt: DateTime
   }
   type Nft {
     id: ID
@@ -56,6 +57,7 @@ exports.typeDefs = (0, apollo_server_1.gql) `
     taker: User
     takerWalletAddress: String
     status: OfferStatus
+    createdAt: DateTime
   }
 
   enum Role {
