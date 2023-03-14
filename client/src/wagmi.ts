@@ -8,7 +8,7 @@ const alchemyId = process.env.VITE_ALCHEMY_API_KEY;
 
 export const wagmiClient = createClient(
   getDefaultClient({
-    appName: "Your App Name",
+    appName: "NFTswap",
     alchemyId,
     chains,
   }),
