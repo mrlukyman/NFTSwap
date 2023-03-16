@@ -240,12 +240,17 @@ export const TradingPanel = () => {
         //remove nft from list
         setListOfSenderNfts(listOfSenderNfts.filter((nftInList) => nftInList.tokenId !== nft.tokenId))
         console.log(listOfSenderNfts)
+      } else if (listOfReceiverNfts.some((nftInList) => nftInList.tokenId === nft.tokenId)) {
+
+        setListReceiverOfNfts(listOfReceiverNfts.filter((nftInList) => nftInList.tokenId !== nft.tokenId))
       } else {
         setListOfSenderNfts([...listOfSenderNfts, nft])
       }
     } else {
       if (listOfReceiverNfts.some((nftInList) => nftInList.tokenId === nft.tokenId)) {
         setListReceiverOfNfts(listOfReceiverNfts.filter((nftInList) => nftInList.tokenId !== nft.tokenId))
+      } else if (listOfSenderNfts.some((nftInList) => nftInList.tokenId === nft.tokenId)) {
+        setListOfSenderNfts(listOfSenderNfts.filter((nftInList) => nftInList.tokenId !== nft.tokenId))
       } else {
         setListReceiverOfNfts([...listOfReceiverNfts, nft])
       }
