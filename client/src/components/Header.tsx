@@ -120,7 +120,7 @@ export const Header = () => {
             dispatch(login({
               email: data.getUser.email,
               username: data.getUser.username,
-              name: data.getUser.name,
+
               walletAddress: newAccount
             }))
           } else {
@@ -128,7 +128,7 @@ export const Header = () => {
             dispatch(login({
               email: null,
               username: null,
-              name: null,
+
               walletAddress: newAccount
             }))
             navigate("/register")
@@ -145,6 +145,7 @@ export const Header = () => {
         }
       })
   }, [dispatch, getUser, navigate])
+
   useEffect(() => {
     if (isConnected) {
       handleConnect(address)
@@ -153,6 +154,7 @@ export const Header = () => {
       dispatch(logout())
     }
   }, [address, data, dispatch, handleConnect, isConnected])
+
   return (
     <Wrapper>
       <LogoLink to="/">

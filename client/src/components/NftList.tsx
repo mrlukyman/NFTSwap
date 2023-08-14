@@ -49,7 +49,6 @@ const Wrapper = styled.div`
       minmax(${size === 'small' ? 3 : 10}rem, 1fr))
     `
   }}
-
 `
 
 const Placeholder = styled.div`
@@ -87,8 +86,10 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
   const getNfts = useCallback(async () => {
     const nfts = isLoggedin ? await alchemy.nft.getNftsForOwner(walletAddress, {
       omitMetadata: false,
-      excludeFilters: [NftFilters.SPAM, NftFilters.AIRDROPS],
+      // excludeFilters: [NftFilters.SPAM, NftFilters.AIRDROPS],
     }) : { ownedNfts: [] }
+    setIsLoading(true)
+    console.log(nfts)
     nftList
       ?
       setListOfNfts(nftList.filter((nft: OwnedNft) => nft.tokenId !== "0"))
@@ -98,10 +99,8 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
   }, [isLoggedin, nftList, walletAddress])
 
   useEffect(() => {
-    setIsLoading(true);
-    getNfts();
-    setIsLoading(false);
-    loadingContext.done();
+    getNfts()
+    loadingContext.done()
   }, [getNfts, loadingContext])
   return (
     <>
