@@ -100,8 +100,8 @@ export const NftList = ({ interactive, nftList, size, showShadow, elementsPerRow
 
   useEffect(() => {
     getNfts()
-    loadingContext.done()
-  }, [getNfts, loadingContext])
+  }, [getNfts])
+
   return (
     <>
       <Wrapper size={size || 'medium'} elementsPerRow={elementsPerRow || 'auto-fill'}>

@@ -1,7 +1,7 @@
 import { NftSwap } from '@traderxyz/nft-swap-sdk'
 import { ethers } from 'ethers'
 import { OwnedNft } from 'alchemy-sdk'
-import { gql, useMutation } from '@apollo/client'
+import { toast } from 'react-toastify';
 
 export const swap = async (userAddress: `0x${string}`, makerNftList: OwnedNft[], takerNftList: OwnedNft[], takerAddress: `0x${string}`) => {
 
@@ -55,7 +55,12 @@ export const swap = async (userAddress: `0x${string}`, makerNftList: OwnedNft[],
     assetsToSwapUserB,
     walletAddressUserA
   );
-  const signedOrder = await nftSwapSdk.signOrder(order, userAddress);
+  const signedOrder = await nftSwapSdk.signOrder(order, userAddress)
+    .then((res) => {
+      toast.success('Order signed successfully');
+      return res
+    })
+  
   // Not so bad, right? We can arbitrarily add more assets to our swap without introducing additional complexity!
   return signedOrder
 }

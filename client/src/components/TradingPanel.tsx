@@ -260,30 +260,21 @@ export const TradingPanel = () => {
   }
 
   const handleSwap = async () => {
-    const response = await toast.promise(
-      swap(defaultWalletAddress, listOfSenderNfts, listOfReceiverNfts, receiverWalletAddress)
-        .then((res) => {
-          createOffer({
-            variables: {
-              makerWalletAddress: defaultWalletAddress,
-              takerWalletAddress: receiverWalletAddress,
-              makerData: res,
-              makerNfts: listOfSenderNfts,
-              takerNfts: listOfReceiverNfts,
-            },
-          })
-          // alert(`🎉 🥳 Order filled`)
+    swap(defaultWalletAddress, listOfSenderNfts, listOfReceiverNfts, receiverWalletAddress)
+      .then((res) => {
+        createOffer({
+          variables: {
+            makerWalletAddress: defaultWalletAddress,
+            takerWalletAddress: receiverWalletAddress,
+            makerData: res,
+            makerNfts: listOfSenderNfts,
+            takerNfts: listOfReceiverNfts,
+          },
         })
-        .catch((err) => {
-          console.log(err)
-        }),
-      {
-        pending: 'Creating a trade offer...',
-        success: 'Trade offer created 👌',
-        error: 'Something went wrong! 🤯'
-      }
-    )
-    console.log(response)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
   }
 
   useEffect(() => {
@@ -332,6 +323,7 @@ export const TradingPanel = () => {
                 </MyNftList>
                 <TradeInfoWrapper>
                   <TradeButton onClick={handleSwap}>Trade</TradeButton>
+                  {/* <TradeButton onClick={(handlePart2)}>Part2</TradeButton> */}
                 </TradeInfoWrapper>
               </TrdingPanel>
             </TradingPanelWrapper>
