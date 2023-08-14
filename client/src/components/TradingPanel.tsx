@@ -14,7 +14,9 @@ import { useDispatch } from 'react-redux'
 import { removeReceiverInfo } from '../store/receiverSlice'
 import { swap, part2 } from '../api/swap'
 import { NftSwap } from '@traderxyz/nft-swap-sdk'
-import { gql, useQuery, useMutation } from '@apollo/client'
+import { gql, useMutation } from '@apollo/client'
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 const GET_USER_INCOMMING_OFFERS = gql`
   query Query($walletAddress: String!) {
@@ -258,22 +260,30 @@ export const TradingPanel = () => {
   }
 
   const handleSwap = async () => {
-    swap(defaultWalletAddress, listOfSenderNfts, listOfReceiverNfts, receiverWalletAddress)
-      .then((res) => {
-        createOffer({
-          variables: {
-            makerWalletAddress: defaultWalletAddress,
-            takerWalletAddress: receiverWalletAddress,
-            makerData: res,
-            makerNfts: listOfSenderNfts,
-            takerNfts: listOfReceiverNfts,
-          },
+    const response = await toast.promise(
+      swap(defaultWalletAddress, listOfSenderNfts, listOfReceiverNfts, receiverWalletAddress)
+        .then((res) => {
+          createOffer({
+            variables: {
+              makerWalletAddress: defaultWalletAddress,
+              takerWalletAddress: receiverWalletAddress,
+              makerData: res,
+              makerNfts: listOfSenderNfts,
+              takerNfts: listOfReceiverNfts,
+            },
+          })
+          // alert(`🎉 🥳 Order filled`)
         })
-        alert(`🎉 🥳 Order filled`)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+        .catch((err) => {
+          console.log(err)
+        }),
+      {
+        pending: 'Creating a trade offer...',
+        success: 'Trade offer created 👌',
+        error: 'Something went wrong! 🤯'
+      }
+    )
+    console.log(response)
   }
 
   useEffect(() => {
@@ -281,6 +291,18 @@ export const TradingPanel = () => {
   }, [handleMyNftsClicked])
   return (
     <>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <Wrapper>
         {isSubmitted ? (
           <>
@@ -310,7 +332,6 @@ export const TradingPanel = () => {
                 </MyNftList>
                 <TradeInfoWrapper>
                   <TradeButton onClick={handleSwap}>Trade</TradeButton>
-                  {/* <TradeButton onClick={(handlePart2)}>Part2</TradeButton> */}
                 </TradeInfoWrapper>
               </TrdingPanel>
             </TradingPanelWrapper>

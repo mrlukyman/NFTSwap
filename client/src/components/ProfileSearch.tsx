@@ -13,6 +13,8 @@ import { NftList } from './NftList'
 import { useGetUser } from '../api/hooks/useGetUser'
 import { part2 } from '../api/swap'
 import { format } from 'date-fns'
+import { toast, ToastContainer } from 'react-toastify';
+import "react-toastify/dist/ReactToastify.css";
 
 const GET_USERS = gql`
   query Query {
@@ -208,11 +210,11 @@ export const ProfileSearch = () => {
       })
   }, [getUser])
 
-
   const getAddresses = useCallback(async () => {
     getUsers().then((res) => {
       if (res.data.getUsers) {
         setUsers(res.data.getUsers)
+        console.log(res.data.getUsers)
       }
     }).catch((err) => {
       console.log(err)
@@ -237,20 +239,38 @@ export const ProfileSearch = () => {
   )
 
   const handleTradeAccept = async (makerData: any, id: number) => {
-    setLoading(true)
-    const tradeHash = part2(makerData)
-      .then((res) => {
-        acceptOffer({
-          variables: {
-            acceptOfferId: id
-          }
+    const response = await toast.promise(
+      part2(makerData)
+        .then((res) => {
+          acceptOffer({
+            variables: {
+              acceptOfferId: id
+            }
+          })
         })
-        setLoading(false)
-        alert(`🎉 🥳 Order filled.TxHash: ${tradeHash}`)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+        .catch((err) => {
+          console.log(err)
+        }),
+      {
+        pending: {
+          render() {
+            return 'Accepting trade...'
+          },
+        },
+        success: {
+          render({ data }) {
+            console.log(data)
+            return `Trade accepted! Hash: ${data} 🎉`
+          },
+        },
+        error: {
+          render() {
+            return 'Something went wrong! 🤯'
+          }
+        }
+      }
+    )
+    console.log(response)
   }
 
   const handleTradeDecline = (declineOfferId: number) => {
@@ -289,74 +309,88 @@ export const ProfileSearch = () => {
     }
   }
   return (
-    <Wrapper>
-      {showSearch ? (
-        <AddressWrapper>
-          <Text>Transfer Address</Text>
-          <SmallText>Enter the username or the address of the user you want to trade with</SmallText>
-          <FormWrapper>
-            <Input
-              type='text'
-              placeholder='@username or 0x...'
-              value={receiver}
-              onChange={(e) => setReceiver(e.target.value)}
-            />
-            {searchResults.map((result: any) => { //TODO: this should be Fuse.FuseResult<userSearchType> (it think) but it doesn't work
-              if (result.walletAddress === address) {
-                return null
-              }
-              return (
-                <ProfileSearchCard
-                  key={result.walletAddress}
-                  handleAddressSubmit={(e: React.MouseEvent<HTMLElement>) =>
-                    handleAddressSubmit(e, result.walletAddress, result.username)}
-                  username={result.username} walletAddress={result.walletAddress}
-                />
-              )
-            })}
-          </FormWrapper>
-        </AddressWrapper>
-      ) : (
-        <TradeButtonWrapper>
-          <ShowTradeButton onClick={() => setShowSearch(true)}>Create trade</ShowTradeButton>
-        </TradeButtonWrapper>
-      )
-      }
-      {incommingOffers?.map((offer: any, idx: number) => {
-        return (
-          <>
-            <TradeWrapper>
-              {offer.status === 'ACCEPTED' || offer.status === 'REJECTED' ?
-                <>
-                  <Overlay />
-                  <TradeInfo style={offer.status === 'ACCEPTED' ? { background: 'green' } : { background: '#000' }} >
-                    {offer.status === 'ACCEPTED' ? <Text>Trade accepted</Text> : <Text>Trade rejected</Text>}
-                  </TradeInfo>
-                </>
-                : null
-              }
-              <TradeHeaderWrapper>
-                <Text>{makerUsername} offered you a trade</Text>
-                <SmallText style={{ color: 'grey' }}>{format(Date.parse(offer.createdAt), "dd.MM.yy")} at {format(Date.parse(offer.createdAt), "h:mm aaa")}</SmallText>
-              </TradeHeaderWrapper>
-              <MyNftList>
-                <TradeListText>Your NFTs</TradeListText>
-                <NftList nftList={offer.takerNfts} size='small' interactive showShadow={false} />
-              </MyNftList>
-              <MyNftList>
-                <TradeListText>{makerUsername}'s NFTs</TradeListText>
-                <NftList nftList={offer.makerNfts} size='small' interactive showShadow={false} />
-              </MyNftList>
-              {offer.status === 'ACCEPTED' || offer.status === 'REJECTED' ? null :
-                <TradeButtonWrapper>
-                  <TradeButton onClick={() => handleTradeDecline(parseInt(offer.id))}>Reject</TradeButton>
-                  <TradeButton onClick={() => handleTradeAccept(offer.makerData, parseInt(offer.id))}>Accept</TradeButton>
-                </TradeButtonWrapper>
-              }
-            </TradeWrapper>
-          </>
+    <>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+      <Wrapper>
+        {showSearch ? (
+          <AddressWrapper>
+            <Text>Transfer Address</Text>
+            <SmallText>Enter the username or the address of the user you want to trade with</SmallText>
+            <FormWrapper>
+              <Input
+                type='text'
+                placeholder='@username or 0x...'
+                value={receiver}
+                onChange={(e) => setReceiver(e.target.value)}
+              />
+              {searchResults.map((result: any) => { //TODO: this should be Fuse.FuseResult<userSearchType> (it think) but it doesn't work
+                if (result.walletAddress === address) {
+                  return null
+                }
+                return (
+                  <ProfileSearchCard
+                    key={result.walletAddress}
+                    handleAddressSubmit={(e: React.MouseEvent<HTMLElement>) =>
+                      handleAddressSubmit(e, result.walletAddress, result.username)}
+                    username={result.username} walletAddress={result.walletAddress}
+                  />
+                )
+              })}
+            </FormWrapper>
+          </AddressWrapper>
+        ) : (
+          <TradeButtonWrapper>
+            <ShowTradeButton onClick={() => setShowSearch(true)}>Create trade</ShowTradeButton>
+          </TradeButtonWrapper>
         )
-      })}
-    </Wrapper >
+        }
+        {incommingOffers?.map((offer: any, idx: number) => {
+          return (
+            <>
+              <TradeWrapper>
+                {offer.status === 'ACCEPTED' || offer.status === 'REJECTED' ?
+                  <>
+                    <Overlay />
+                    <TradeInfo style={offer.status === 'ACCEPTED' ? { background: 'green' } : { background: '#000' }} >
+                      {offer.status === 'ACCEPTED' ? <Text>Trade accepted</Text> : <Text>Trade rejected</Text>}
+                    </TradeInfo>
+                  </>
+                  : null
+                }
+                <TradeHeaderWrapper>
+                  <Text>{makerUsername} offered you a trade</Text>
+                  <SmallText style={{ color: 'grey' }}>{format(Date.parse(offer.createdAt), "dd.MM.yy")} at {format(Date.parse(offer.createdAt), "h:mm aaa")}</SmallText>
+                </TradeHeaderWrapper>
+                <MyNftList>
+                  <TradeListText>Your NFTs</TradeListText>
+                  <NftList nftList={offer.takerNfts} size='small' interactive showShadow={false} />
+                </MyNftList>
+                <MyNftList>
+                  <TradeListText>{makerUsername}'s NFTs</TradeListText>
+                  <NftList nftList={offer.makerNfts} size='small' interactive showShadow={false} />
+                </MyNftList>
+                {offer.status === 'ACCEPTED' || offer.status === 'REJECTED' ? null :
+                  <TradeButtonWrapper>
+                    <TradeButton onClick={() => handleTradeDecline(parseInt(offer.id))}>Reject</TradeButton>
+                    <TradeButton onClick={() => handleTradeAccept(offer.makerData, parseInt(offer.id))}>Accept</TradeButton>
+                  </TradeButtonWrapper>
+                }
+              </TradeWrapper>
+            </>
+          )
+        })}
+      </Wrapper >
+    </>
   )
 }
