@@ -271,6 +271,7 @@ export const TradingPanel = () => {
             takerNfts: listOfReceiverNfts,
           },
         })
+        dispatch(removeReceiverInfo())
       })
       .catch((err) => {
         console.log(err)
@@ -280,6 +281,7 @@ export const TradingPanel = () => {
   useEffect(() => {
     handleMyNftsClicked()
   }, [handleMyNftsClicked])
+
   return (
     <>
       <ToastContainer
