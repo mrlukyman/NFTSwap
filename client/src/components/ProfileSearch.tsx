@@ -13,6 +13,7 @@ import { NftList } from './NftList'
 import { useGetUser } from '../api/hooks/useGetUser'
 import { part2 } from '../api/swap'
 import { format } from 'date-fns'
+import { sortOffers } from '../utils/sortOffers'
 import { toast, ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 
@@ -182,6 +183,19 @@ const TradeListText = styled(Text)`
   margin: 0 0 1rem 0;
 `
 
+const ShowButton = styled(Button)`
+  background: ${Colors.cardBackground};
+  border: ${Colors.buttonBackground} 1px solid;
+  color: #fff;
+  &:hover {
+    background: ${Colors.cardBackgroundFocus};
+    border: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+  }
+`
+
 export const ProfileSearch = () => {
   const address = useSelector((state: any) => state.user.user.walletAddress)
   const dispatch = useDispatch()
@@ -191,7 +205,6 @@ export const ProfileSearch = () => {
   const [searchResults, setSearchResults] = useState<string[]>([])
   const [makerUsername, setMakerUsername] = useState<string>('')
   const [incommingOffers, setIncommingOffers] = useState<any>([])
-  const [loading, setLoading] = useState<boolean>(false)
   const [showSearch, setShowSearch] = useState<boolean>(false)
 
   const [getUsers] = useLazyQuery(GET_USERS)
@@ -234,19 +247,18 @@ export const ProfileSearch = () => {
         sortFn: function (a, b) {
           return a.score - b.score
         }
-      }),
-    [users]
-  )
+      }), [users])
 
   const handleTradeAccept = async (makerData: any, id: number) => {
     const response = await toast.promise(
       part2(makerData)
-        .then((res) => {
-          acceptOffer({
+        .then(async (hash) => {  // capture the hash
+          await acceptOffer({   // await for the mutation to complete
             variables: {
               acceptOfferId: id
             }
-          })
+          });
+          return hash;  // return the hash
         })
         .catch((err) => {
           console.log(err)
@@ -259,8 +271,15 @@ export const ProfileSearch = () => {
         },
         success: {
           render({ data }) {
-            console.log(data)
-            return `Trade accepted! Hash: ${data} 🎉`
+            console.log(data)  // data should be the hash returned from part2
+            return (
+              <>
+                Trade accepted!🎉
+                <a href={`https://polygonscan.com/tx/${data}`}>
+                  <ShowButton>Show on poligonscan</ShowButton>
+                </a>
+              </>
+            )
           },
         },
         error: {
@@ -273,15 +292,31 @@ export const ProfileSearch = () => {
     console.log(response)
   }
 
+
   const handleTradeDecline = (declineOfferId: number) => {
-    console.log(incommingOffers)
     declineOffer({
       variables: {
         declineOfferId
       }
     })
       .then((res) => {
-        console.log(res)
+        console.log(res);
+
+        // Update the incommingOffers state to set the declined offer's status to REJECTED.
+        const updatedOffers = incommingOffers.map((offer: any) => {
+          if (offer.id === declineOfferId) {
+            return {
+              ...offer,
+              status: 'REJECTED'
+            };
+          }
+          return offer;
+        });
+
+        // Sort the offers
+        const sortedOffers = sortOffers(updatedOffers);
+        setIncommingOffers(sortedOffers);
+
       }).catch((err) => {
         console.log(err)
       })
